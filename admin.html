@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin · Malibú Cookies</title>
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img class="ring" src="img/logo.png" alt="">Malibú Cookies</a>
+    <div class="adm-bar" style="margin-left:auto">
+      <a class="btn btn-ghost" href="./">Ver tienda</a>
+      <button class="btn btn-ink" type="button" id="logout" hidden>Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Ingreso -->
+  <section id="vista-login" style="padding-top:0">
+    <div class="wrap">
+      <div class="card login">
+        <img class="logo ring" src="img/logo.png" alt="Malibú Cookies">
+        <h2>Administración</h2>
+        <p class="hint" style="color:var(--ink-soft)">Ingresa con el usuario y la clave de la pestaña “Credenciales” de tu hoja de Google.</p>
+        <form class="form" id="login-form" autocomplete="on">
+          <label for="lg-user">Usuario<input id="lg-user" name="username" autocomplete="username" required autocapitalize="none" spellcheck="false"></label>
+          <label for="lg-pass">Clave<input id="lg-pass" name="password" type="password" autocomplete="current-password" required></label>
+          <button class="btn btn-ink" type="submit" id="lg-btn">Ingresar</button>
+          <p class="msg" id="lg-msg" role="status"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Panel -->
+  <section class="admin" id="vista-panel" hidden>
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="eyebrow">Solo para ti</div><h2>Administración</h2><p>Los cambios se guardan en tu hoja de Google y se ven en la tienda al instante.</p></div>
+      </div>
+      <div class="cols">
+        <div class="tools">
+          <div class="card">
+            <h3>Confirmar pedido pagado</h3>
+            <p class="hint">Pega el mensaje de WhatsApp del cliente. Cuando el pago esté confirmado, toca el botón y el stock se descuenta.</p>
+            <label for="order-in" class="hint" style="display:block;margin:0 0 6px">Mensaje del pedido</label>
+            <textarea id="order-in" placeholder="Hola Malibú! Quiero hacer este pedido:&#10;• 2 × Menta&#10;• 1 × Mango"></textarea>
+            <ul class="parsed" id="parsed"></ul>
+            <button class="btn btn-ink" type="button" id="confirm-btn" disabled>Pago confirmado: descontar stock</button>
+            <p class="msg" id="confirm-msg" role="status"></p>
+          </div>
+          <div class="card">
+            <h3>Agregar sabor o producto</h3>
+            <p class="hint">Aparece en la tienda apenas lo guardas.</p>
+            <form class="form" id="add-form">
+              <label for="np-name">Nombre<input id="np-name" required maxlength="60" placeholder="Ej: Frutilla"></label>
+              <div class="two">
+                <label for="np-cat">Sección<select id="np-cat"><option value="c">Cookies clásicas</option><option value="p">Cookies premium</option><option value="f">Frutitas virales</option></select></label>
+                <label for="np-qty">Stock inicial<input id="np-qty" type="number" min="0" step="1" inputmode="numeric" placeholder="Sin control"></label>
+              </div>
+              <label for="np-img">Foto (opcional)<input id="np-img" type="file" accept="image/*"></label>
+              <button class="btn btn-ink" type="submit" id="np-save">Agregar</button>
+              <p class="msg" id="add-msg" role="status"></p>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Pedidos confirmados</h3>
+            <p class="hint">Si te equivocaste, “Anular” devuelve las unidades al stock.</p>
+            <ul class="orders" id="orders"><li>Cargando…</li></ul>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Productos y stock</h3>
+          <p class="hint">Escribe las unidades disponibles y sal del recuadro para guardar. Vacío significa sin control de stock.</p>
+          <div class="prod-list" id="prod-list"><p class="loading">Cargando…</p></div>
+          <p class="msg" id="stock-msg" role="status"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="config.js"></script>
+<script src="comun.js"></script>
+<script>
+let token = null;
+let productos = [], porId = {}, porNombre = {};
+
+function leerToken() { try { return sessionStorage.getItem("malibu_token"); } catch (e) { return null; } }
+function guardarToken(t) { try { t ? sessionStorage.setItem("malibu_token", t) : sessionStorage.removeItem("malibu_token"); } catch (e) {} }
+function aviso(id, texto, ok) { const m = $(id); m.textContent = texto; m.className = "msg " + (ok ? "ok" : "err"); }
+
+function mostrar(panel) {
+  $("vista-login").hidden = panel;
+  $("vista-panel").hidden = !panel;
+  $("logout").hidden = !panel;
+}
+
+async function api(body) {
+  const r = await Malibu.post({ ...body, token });
+  if (r && r.error === "sesion") {
+    token = null; guardarToken(null); mostrar(false);
+    aviso("lg-msg", r.mensaje, false);
+  }
+  if (r && r.productos) usarProductos(r.productos);
+  if (r && r.pedidos) pintarPedidos(r.pedidos);
+  return r || { ok: false, mensaje: "Respuesta vacía." };
+}
+
+/* ---------- ingreso ---------- */
+$("login-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("lg-btn"); btn.disabled = true;
+  aviso("lg-msg", "Verificando…", true);
+  const r = await Malibu.post({ action: "login", usuario: $("lg-user").value, clave: $("lg-pass").value });
+  btn.disabled = false;
+  if (!r.ok) { aviso("lg-msg", r.mensaje || "No se pudo ingresar.", false); return; }
+  token = r.token; guardarToken(token);
+  $("lg-pass").value = ""; $("lg-msg").textContent = "";
+  entrar();
+});
+$("logout").addEventListener("click", async () => {
+  await Malibu.post({ action: "logout", token });
+  token = null; guardarToken(null); mostrar(false);
+});
+
+async function entrar() {
+  mostrar(true);
+  try { usarProductos(await Malibu.catalogo() || []); } catch (e) { aviso("stock-msg", "No se pudo leer el catálogo.", false); }
+  api({ action: "pedidos" });
+}
+
+/* ---------- productos y stock ---------- */
+function usarProductos(lista) {
+  productos = lista;
+  porId = Object.fromEntries(productos.map(p => [p.id, p]));
+  porNombre = Object.fromEntries(productos.map(p => [norm(p.name), p.id]));
+  pintarProductos(); leerPedidoPegado();
+}
+function pintarProductos() {
+  const enfocado = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.s : null;
+  $("prod-list").innerHTML = ["c", "p", "f"].map(c => `<div class="prod-group"><h4>${MALIBU_SECCIONES[c]} (${porSeccion(productos, c).length})</h4>${porSeccion(productos, c).map(p => `<div class="prod-row"><img src="${fotoDe(p)}" alt=""><span class="nm">${esc(p.name)}</span><input type="number" min="0" step="1" inputmode="numeric" id="st-${esc(p.id)}" data-s="${esc(p.id)}" value="${typeof p.stock === "number" ? p.stock : ""}" placeholder="—" aria-label="Stock de ${esc(p.name)}"><button class="del" type="button" data-del="${esc(p.id)}">Eliminar</button></div>`).join("")}</div>`).join("");
+  if (enfocado && $("st-" + enfocado)) $("st-" + enfocado).focus();
+}
+$("prod-list").addEventListener("change", async e => {
+  const inp = e.target.closest("input[data-s]");
+  if (!inp) return;
+  const id = inp.dataset.s, nombre = porId[id]?.name || id;
+  aviso("stock-msg", "Guardando…", true);
+  const r = await api({ action: "guardarStock", id, stock: inp.value.trim() });
+  aviso("stock-msg", r.ok ? "Stock guardado: " + nombre : (r.mensaje || "No se pudo guardar."), r.ok);
+});
+$("prod-list").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-del]");
+  if (!b) return;
+  if (!b.classList.contains("sure")) {
+    document.querySelectorAll(".del.sure").forEach(x => { x.classList.remove("sure"); x.textContent = "Eliminar"; });
+    b.classList.add("sure"); b.textContent = "¿Eliminar? Toca otra vez";
+    return;
+  }
+  const id = b.dataset.del, nombre = porId[id]?.name || id;
+  b.disabled = true;
+  const r = await api({ action: "eliminarProducto", id });
+  aviso("stock-msg", r.ok ? "Eliminado: " + nombre : (r.mensaje || "No se pudo eliminar."), r.ok);
+  if (!r.ok) b.disabled = false;
+});
+
+async function fotoEnBase64(file) {
+  const bmp = await createImageBitmap(file);
+  const S = 480, lado = Math.min(bmp.width, bmp.height);
+  const c = document.createElement("canvas");
+  c.width = c.height = S;
+  c.getContext("2d").drawImage(bmp, (bmp.width - lado) / 2, (bmp.height - lado) / 2, lado, lado, 0, 0, S, S);
+  return c.toDataURL("image/jpeg", 0.85);
+}
+$("add-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const nombre = $("np-name").value.trim();
+  if (!nombre) { aviso("add-msg", "Escribe un nombre.", false); return; }
+  if (porNombre[norm(nombre)]) { aviso("add-msg", "Ya existe un producto con ese nombre.", false); return; }
+  const btn = $("np-save"); btn.disabled = true;
+  aviso("add-msg", "Guardando…", true);
+  let fotoBase64 = "";
+  const archivo = $("np-img").files[0];
+  if (archivo) {
+    try { fotoBase64 = await fotoEnBase64(archivo); }
+    catch (err) { aviso("add-msg", "No pude leer esa foto. Prueba con una JPG o PNG.", false); btn.disabled = false; return; }
+  }
+  const cat = $("np-cat").value;
+  const r = await api({ action: "agregarProducto", nombre, cat, stock: $("np-qty").value.trim(), fotoBase64 });
+  btn.disabled = false;
+  if (r.ok) { $("add-form").reset(); aviso("add-msg", `Agregado: ${nombre} en ${MALIBU_SECCIONES[cat]}.`, true); }
+  else aviso("add-msg", r.mensaje || "No se pudo agregar.", false);
+});
+
+/* ---------- pedidos ---------- */
+let pegado = [];
+function leerPedidoPegado() {
+  const texto = $("order-in").value;
+  pegado = [];
+  texto.split(/\n/).forEach(linea => {
+    const m = linea.match(/(\d+)\s*[×xX*]\s*(.+)$/);
+    if (m) pegado.push({ qty: Number(m[1]), raw: m[2].trim(), id: porNombre[norm(m[2])] });
+  });
+  const malo = pegado.some(p => !p.id || quedan(porId[p.id]) < p.qty);
+  $("parsed").innerHTML = pegado.map(p => {
+    if (!p.id) return `<li class="bad"><span>${esc(p.raw)}</span><span>No está en el menú</span></li>`;
+    const n = quedan(porId[p.id]);
+    return `<li class="${n < p.qty ? "bad" : ""}"><span>${p.qty} × ${esc(porId[p.id].name)}</span><span>${n === Infinity ? "sin control de stock" : n < p.qty ? "Solo quedan " + n : "quedarán " + (n - p.qty)}</span></li>`;
+  }).join("");
+  $("confirm-btn").disabled = !pegado.length || malo;
+}
+$("order-in").addEventListener("input", () => { leerPedidoPegado(); $("confirm-msg").textContent = ""; });
+$("confirm-btn").addEventListener("click", async () => {
+  if (!pegado.length) return;
+  const btn = $("confirm-btn"); btn.disabled = true;
+  const cliente = (($("order-in").value.match(/Nombre:\s*(.+)/) || [])[1] || "").trim();
+  aviso("confirm-msg", "Guardando…", true);
+  const r = await api({ action: "confirmarPedido", items: pegado.map(p => ({ id: p.id, qty: p.qty })), cliente });
+  if (r.ok) { $("order-in").value = ""; leerPedidoPegado(); aviso("confirm-msg", "Pedido confirmado. Stock descontado.", true); }
+  else { aviso("confirm-msg", r.mensaje || "No se pudo confirmar.", false); btn.disabled = false; }
+});
+function pintarPedidos(lista) {
+  if (!lista.length) { $("orders").innerHTML = "<li>Aún no hay pedidos confirmados.</li>"; return; }
+  $("orders").innerHTML = lista.map(o => {
+    const fecha = new Date(o.fecha);
+    const cuando = isNaN(fecha) ? "" : fecha.toLocaleString("es-CL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    const anulado = o.estado === "anulado";
+    return `<li><div class="meta"><span>${esc(o.cliente || "Cliente")}</span><span>${cuando}</span></div><div class="detalle${anulado ? " void" : ""}">${esc(o.detalle)}</div>${anulado ? "<small>Anulado, stock devuelto</small>" : `<button class="linkbtn" type="button" data-anular="${esc(o.id)}">Anular y devolver stock</button>`}</li>`;
+  }).join("");
+}
+$("orders").addEventListener("click", async e => {
+  const b = e.target.closest("[data-anular]");
+  if (!b) return;
+  if (!b.classList.contains("sure")) { b.classList.add("sure"); b.textContent = "¿Anular? Toca otra vez"; return; }
+  b.disabled = true;
+  const r = await api({ action: "anularPedido", id: b.dataset.anular });
+  if (!r.ok) { b.disabled = false; aviso("confirm-msg", r.mensaje || "No se pudo anular.", false); }
+});
+
+/* ---------- inicio ---------- */
+if (!Malibu.hayApi()) {
+  aviso("lg-msg", "Falta configurar la conexión con Google Sheets (config.js).", false);
+  $("lg-btn").disabled = true;
+} else {
+  token = leerToken();
+  if (token) {
+    Malibu.post({ action: "sesion", token }).then(r => { if (r.ok) entrar(); else { token = null; guardarToken(null); } });
+  }
+}
+</script>
+</body>
+</html>

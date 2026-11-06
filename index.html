@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Malibú Cookies · Talca</title>
+<meta name="description" content="Cookies rellenas hechas a mano y frutitas virales en Talca. Arma tu caja y pide por WhatsApp.">
+<meta property="og:title" content="Malibú Cookies">
+<meta property="og:description" content="Cookies rellenas hechas a mano y frutitas virales en Talca.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio"><img class="ring" src="img/logo.png" alt="">Malibú Cookies</a>
+    <nav class="links" aria-label="Secciones">
+      <a href="#menu">Menú</a><a href="#frutitas">Frutitas virales</a><a href="#pedir">Cómo pedir</a><a href="#nosotros">Nosotros</a>
+    </nav>
+    <a class="btn btn-ink" href="#menu" id="order-link">Armar pedido</a>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero" style="padding-block:0">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">By Helen Villanueva · Talca</div>
+        <h1><span>Cookies Malibú</span>Cookies rellenas y hechas a mano</h1>
+        <p class="lead">Sabores clásicos, premium y las frutitas virales que todos quieren probar. Arma tu caja y envíanos el pedido por WhatsApp.</p>
+        <div class="ctas">
+          <a class="btn btn-ink" href="#menu">Ver el menú</a>
+          <a class="btn btn-ghost" href="https://wa.me/56956014992" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+      <div class="stage" aria-hidden="true">
+        <img class="logo" src="img/logo.png" alt="">
+        <img class="ck c1" src="img/menta.jpg" alt="">
+        <img class="ck c2" src="img/cheesecake-velvet.jpg" alt="">
+        <img class="ck c3" src="img/m-m.jpg" alt="">
+      </div>
+    </div>
+  </section>
+
+  <div class="strip"><div class="wrap"><span>Clásicas</span><span>✦</span><span>Premium</span><span>✦</span><span>Frutitas virales</span><span>✦</span><span>Delivery en Talca</span></div></div>
+
+  <section id="menu">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">Cookies Malibú</div>
+          <h2>Menú</h2>
+          <p>Toca + en las que quieras. Cuando tengas tu caja lista, envíanos el pedido por WhatsApp.</p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Categoría">
+          <button role="tab" id="tab-c" aria-selected="true" data-cat="c">Clásicas<small id="n-c"></small></button>
+          <button role="tab" id="tab-p" aria-selected="false" data-cat="p">Premium<small id="n-p"></small></button>
+        </div>
+      </div>
+      <div class="grid" id="grid"><p class="loading">Cargando el menú…</p></div>
+    </div>
+  </section>
+
+  <section class="frutitas" id="frutitas">
+    <div class="wrap fr">
+      <div>
+        <div class="eyebrow">Nuevo</div>
+        <h2>Frutitas virales</h2>
+        <p>Postres con forma de fruta, pintados a mano uno por uno y servidos sobre base dorada. Elige tus sabores y cuántas quieres de cada uno.</p>
+        <div class="fr-grid" id="fr-grid"><p class="loading">Cargando…</p></div>
+      </div>
+      <div class="mosaic">
+        <img src="img/frutitas.jpg" alt="Frutitas virales sobre bases doradas">
+        <img src="img/frutitas-mesa.jpg" alt="Frutitas virales sobre una mesa de mármol">
+        <img src="img/frutitas-duo.jpg" alt="Frutitas virales de cerca">
+      </div>
+    </div>
+  </section>
+
+  <section id="pedir">
+    <div class="wrap">
+      <div class="sec-head"><div><div class="eyebrow">Fácil y rápido</div><h2>Cómo pedir</h2></div></div>
+      <div class="steps">
+        <div class="card step"><b>1</b><h3>Arma tu caja</h3><p>Elige sabores con el botón +. Puedes mezclar clásicas, premium y frutitas.</p></div>
+        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Escribe tu nombre y sector, y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
+        <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
+      </div>
+      <div class="info">
+        <div class="card">
+          <h3>Entregas en Talca</h3>
+          <p>Hacemos delivery dentro de Talca. El costo del despacho varía según el sector donde vivas; te lo confirmamos junto con el total de tu pedido.</p>
+        </div>
+        <div class="card">
+          <h3>WhatsApp</h3>
+          <p>Pedidos y consultas al</p>
+          <div class="phone">+56 9 5601 4992</div>
+          <p style="margin-top:10px"><a class="btn btn-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Abrir WhatsApp</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="nosotros" style="padding-top:20px">
+    <div class="wrap">
+      <img class="ring" src="img/logo.png" alt="Logo de Malibú Cookies">
+      <div>
+        <div class="eyebrow">Nosotros</div>
+        <h2>Hecho por Helen, horneado para compartir</h2>
+        <p>Malibú Cookies es la pastelería de Helen Villanueva en Talca. Cada cookie se hornea bien gruesa y con el centro suave, y se termina con su relleno y topping a mano.</p>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+<footer><div class="wrap"><span>© Malibú Cookies · by Helen Villanueva · Talca</span><span>WhatsApp +56 9 5601 4992 · <a href="https://www.instagram.com/malibu_cookies_/" target="_blank" rel="noopener">@malibu_cookies_</a></span></div></footer>
+
+<div class="bag" id="bag" hidden>
+  <div class="inner">
+    <div class="sum"><strong id="bag-count">0 productos</strong><span id="bag-list"></span></div>
+    <button class="btn btn-line" type="button" id="bag-toggle">Datos</button>
+    <a class="btn btn-wa" id="bag-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+    <div class="fields">
+      <label for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
+      <label for="f-sector">Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
+      <pre id="bag-text"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="comun.js"></script>
+<script>
+let productos = [];
+let porId = {}, porNombre = {};
+const carrito = {};
+let seccion = "c";
+
+function indexar() {
+  porId = Object.fromEntries(productos.map(p => [p.id, p]));
+  porNombre = Object.fromEntries(productos.map(p => [norm(p.name), p.id]));
+}
+function etiqueta(p) {
+  const n = quedan(p);
+  if (n === Infinity) return "";
+  if (n <= 0) return `<span class="badge out">Agotado</span>`;
+  return `<span class="badge${n <= 3 ? " low" : ""}">Quedan ${n}</span>`;
+}
+function tarjeta(p, num) {
+  const q = carrito[p.id] || 0, n = quedan(p);
+  return `<div class="item${q ? " on" : ""}${n <= 0 ? " soldout" : ""}"><div class="plate">${num ? `<span class="num">${num}</span>` : ""}<img src="${fotoDe(p)}" alt="${esc(p.name)}" loading="lazy">${etiqueta(p)}</div><h3>${esc(p.name)}</h3><div class="qty"><button class="minus" type="button" data-s="${esc(p.id)}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><output>${q}</output><button class="add" type="button" data-s="${esc(p.id)}" data-d="1" aria-label="Agregar ${esc(p.name)}"${q >= n ? " disabled" : ""}>+</button></div></div>`;
+}
+function pintar() {
+  $("n-c").textContent = porSeccion(productos, "c").length;
+  $("n-p").textContent = porSeccion(productos, "p").length;
+  $("grid").innerHTML = porSeccion(productos, seccion).map((p, i) => tarjeta(p, seccion === "c" ? i + 1 : "P" + (i + 1))).join("") || `<p class="loading">Pronto habrá sabores aquí.</p>`;
+  $("fr-grid").innerHTML = porSeccion(productos, "f").map(p => tarjeta(p)).join("") || `<p class="loading">Pronto habrá frutitas aquí.</p>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".qty button[data-s]");
+  if (!b) return;
+  const id = b.dataset.s, p = porId[id];
+  if (!p) return;
+  carrito[id] = Math.min(quedan(p), Math.max(0, (carrito[id] || 0) + Number(b.dataset.d)));
+  if (!carrito[id]) delete carrito[id];
+  pintar(); actualizarBolsa();
+});
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  seccion = b.dataset.cat;
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  pintar();
+}));
+
+function textoPedido() {
+  const lineas = Object.entries(carrito).filter(([id]) => porId[id]).map(([id, q]) => `• ${q} × ${porId[id].name}`);
+  const nombre = $("f-name").value.trim(), sector = $("f-sector").value.trim();
+  return "Hola Malibú! Quiero hacer este pedido:\n" + lineas.join("\n") + (nombre ? `\n\nNombre: ${nombre}` : "") + (sector ? `\nEntrega en: ${sector}` : "");
+}
+function actualizarBolsa() {
+  for (const id in carrito) if (!porId[id]) delete carrito[id];
+  const total = Object.values(carrito).reduce((a, b) => a + b, 0);
+  $("bag").hidden = !total;
+  $("bag-count").textContent = total + (total === 1 ? " producto" : " productos");
+  $("bag-list").textContent = Object.keys(carrito).map(id => porId[id].name).join(", ");
+  const t = textoPedido();
+  $("bag-text").textContent = t;
+  $("bag-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(t)}`;
+}
+$("bag-toggle").addEventListener("click", () => {
+  const abierto = $("bag").classList.toggle("open");
+  $("bag-toggle").textContent = abierto ? "Cerrar" : "Datos";
+});
+["f-name", "f-sector"].forEach(id => $(id).addEventListener("input", actualizarBolsa));
+
+async function cargar() {
+  try {
+    const lista = await Malibu.catalogo();
+    productos = lista || MALIBU_BASE.slice();
+  } catch (e) {
+    productos = MALIBU_BASE.map(p => ({ ...p, stock: null }));
+  }
+  indexar();
+  for (const id in carrito) {
+    if (!porId[id]) { delete carrito[id]; continue; }
+    carrito[id] = Math.min(carrito[id], quedan(porId[id]));
+    if (carrito[id] <= 0) delete carrito[id];
+  }
+  pintar(); actualizarBolsa();
+}
+cargar();
+// Si la persona vuelve a la pestaña, se actualiza el stock.
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && Malibu.hayApi()) cargar(); });
+</script>
+</body>
+</html>
