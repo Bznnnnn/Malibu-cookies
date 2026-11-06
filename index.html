@@ -30,11 +30,11 @@
     <div class="wrap">
       <div>
         <div class="eyebrow">By Helen Villanueva · Talca</div>
-        <h1><span>Cookies Malibú</span>Cookies rellenas y hechas a mano</h1>
+        <h1><span>Cookies rellenas y hechas a mano</span>Cookies Malibú</h1>
         <p class="lead">Sabores clásicos, premium y las frutitas virales que todos quieren probar. Arma tu caja y envíanos el pedido por WhatsApp.</p>
         <div class="ctas">
           <a class="btn btn-ink" href="#menu">Ver el menú</a>
-          <a class="btn btn-ghost" href="https://wa.me/56956014992" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn btn-ghost" href="https://wa.me/56956014992?text=Hola%20Malib%C3%BA%2C%20me%20gustar%C3%ADa%20saber%20qu%C3%A9%20productos%20tienes%20disponibles%20%E2%9C%A8%F0%9F%92%96" data-wa-saludo target="_blank" rel="noopener">WhatsApp</a>
         </div>
       </div>
       <div class="stage" aria-hidden="true">
@@ -46,7 +46,7 @@
     </div>
   </section>
 
-  <div class="strip"><div class="wrap"><span>Clásicas</span><span>✦</span><span>Premium</span><span>✦</span><span>Frutitas virales</span><span>✦</span><span>Delivery en Talca</span></div></div>
+  <nav class="strip" aria-label="Ir a una sección"><div class="wrap"><a href="#menu" data-tab="c">Clásicas</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="p">Premium</a><span aria-hidden="true">✦</span><a href="#frutitas">Frutitas virales</a><span aria-hidden="true">✦</span><a href="#entregas">Delivery en Talca</a></div></nav>
 
   <section id="menu">
     <div class="wrap">
@@ -86,19 +86,19 @@
       <div class="sec-head"><div><div class="eyebrow">Fácil y rápido</div><h2>Cómo pedir</h2></div></div>
       <div class="steps">
         <div class="card step"><b>1</b><h3>Arma tu caja</h3><p>Elige sabores con el botón +. Puedes mezclar clásicas, premium y frutitas.</p></div>
-        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Escribe tu nombre y sector, y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
+        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
         <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
       </div>
       <div class="info">
-        <div class="card">
+        <div class="card" id="entregas">
           <h3>Entregas en Talca</h3>
-          <p>Hacemos delivery dentro de Talca. El costo del despacho varía según el sector donde vivas; te lo confirmamos junto con el total de tu pedido.</p>
+          <p>Hacemos delivery dentro de Talca. El costo del despacho varía según el sector donde vivas; te lo confirmamos junto con el total de tu pedido. Si prefieres retirar, elige Retiro al hacer tu pedido y lo coordinamos por WhatsApp.</p>
         </div>
         <div class="card">
           <h3>WhatsApp</h3>
           <p>Pedidos y consultas al</p>
           <div class="phone">+56 9 5601 4992</div>
-          <p style="margin-top:10px"><a class="btn btn-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Abrir WhatsApp</a></p>
+          <p style="margin-top:10px"><a class="btn btn-wa" href="https://wa.me/56956014992?text=Hola%20Malib%C3%BA%2C%20me%20gustar%C3%ADa%20saber%20qu%C3%A9%20productos%20tienes%20disponibles%20%E2%9C%A8%F0%9F%92%96" data-wa-saludo target="_blank" rel="noopener">Abrir WhatsApp</a></p>
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@
       <div>
         <div class="eyebrow">Nosotros</div>
         <h2>Hecho por Helen, horneado para compartir</h2>
-        <p>Malibú Cookies es la pastelería de Helen Villanueva en Talca. Cada cookie se hornea bien gruesa y con el centro suave, y se termina con su relleno y topping a mano.</p>
+        <p>En Malibú Cookies, Helen Villanueva hornea en Talca cookies estilo New York: grandes, gruesas y suaves, con un corazón relleno y toppings en cada una.</p>
       </div>
     </div>
   </section>
@@ -124,9 +124,16 @@
     <div class="sum"><strong id="bag-count">0 productos</strong><span id="bag-list"></span></div>
     <button class="btn btn-line" type="button" id="bag-toggle">Datos</button>
     <a class="btn btn-wa" id="bag-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Enviar por WhatsApp</a>
-    <div class="fields">
-      <label for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
-      <label for="f-sector">Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
+    <div class="fields" id="bag-fields">
+      <div class="modo" role="radiogroup" aria-labelledby="modo-titulo">
+        <span id="modo-titulo">¿Cómo lo quieres recibir?</span>
+        <label class="opt" for="f-delivery"><input type="radio" name="entrega" value="Delivery" id="f-delivery"><span>Delivery</span></label>
+        <label class="opt" for="f-retiro"><input type="radio" name="entrega" value="Retiro" id="f-retiro"><span>Retiro</span></label>
+      </div>
+      <p class="aviso" id="f-aviso" role="alert" hidden>Elige delivery o retiro para enviar tu pedido.</p>
+      <label class="campo-nombre" for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
+      <label id="f-sector-wrap" for="f-sector" hidden>Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
+      <p class="nota" id="f-nota-retiro" hidden>Coordinamos el retiro contigo por WhatsApp.</p>
       <pre id="bag-text"></pre>
     </div>
   </div>
@@ -169,30 +176,63 @@ document.addEventListener("click", e => {
   if (!carrito[id]) delete carrito[id];
   pintar(); actualizarBolsa();
 });
-document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
-  seccion = b.dataset.cat;
-  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
-  pintar();
-}));
+function elegirSeccion(c) {
+  seccion = c;
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.cat === c));
+  if (productos.length) pintar();
+}
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => elegirSeccion(b.dataset.cat)));
+// Enlaces de la barra azul: llevan a la sección y eligen la pestaña que corresponde.
+document.querySelectorAll(".strip a[data-tab]").forEach(a => a.addEventListener("click", () => elegirSeccion(a.dataset.tab)));
+
+// Botones generales de WhatsApp: abren el chat con un saludo.
+const SALUDO = "Hola Malibú, me gustaría saber qué productos tienes disponibles ✨💖";
+document.querySelectorAll("[data-wa-saludo]").forEach(a => { a.href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(SALUDO)}`; });
+
+let entrega = ""; // "Delivery" o "Retiro"
 
 function textoPedido() {
   const lineas = Object.entries(carrito).filter(([id]) => porId[id]).map(([id, q]) => `• ${q} × ${porId[id].name}`);
   const nombre = $("f-name").value.trim(), sector = $("f-sector").value.trim();
-  return "Hola Malibú! Quiero hacer este pedido:\n" + lineas.join("\n") + (nombre ? `\n\nNombre: ${nombre}` : "") + (sector ? `\nEntrega en: ${sector}` : "");
+  const datos = [];
+  if (nombre) datos.push(`Nombre: ${nombre}`);
+  if (entrega) datos.push(`Entrega: ${entrega}`);
+  if (entrega === "Delivery" && sector) datos.push(`Dirección: ${sector}`);
+  return "Hola Malibú! Quiero hacer este pedido:\n" + lineas.join("\n") + (datos.length ? "\n\n" + datos.join("\n") : "");
 }
 function actualizarBolsa() {
   for (const id in carrito) if (!porId[id]) delete carrito[id];
   const total = Object.values(carrito).reduce((a, b) => a + b, 0);
   $("bag").hidden = !total;
-  $("bag-count").textContent = total + (total === 1 ? " producto" : " productos");
+  $("bag-count").textContent = total + (total === 1 ? " producto" : " productos") + (entrega ? " · " + entrega : "");
   $("bag-list").textContent = Object.keys(carrito).map(id => porId[id].name).join(", ");
   const t = textoPedido();
   $("bag-text").textContent = t;
   $("bag-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(t)}`;
 }
-$("bag-toggle").addEventListener("click", () => {
-  const abierto = $("bag").classList.toggle("open");
+function abrirDatos(abrir) {
+  const abierto = $("bag").classList.toggle("open", abrir);
   $("bag-toggle").textContent = abierto ? "Cerrar" : "Datos";
+}
+$("bag-toggle").addEventListener("click", () => abrirDatos(!$("bag").classList.contains("open")));
+
+document.querySelectorAll('input[name="entrega"]').forEach(r => r.addEventListener("change", () => {
+  entrega = r.value;
+  const esDelivery = entrega === "Delivery";
+  $("f-sector-wrap").hidden = !esDelivery;
+  $("f-nota-retiro").hidden = esDelivery;
+  $("bag-fields").classList.toggle("retiro", !esDelivery);
+  $("f-aviso").hidden = true;
+  actualizarBolsa();
+}));
+
+// Sin elegir delivery o retiro, el botón abre los datos en vez de ir a WhatsApp.
+$("bag-wa").addEventListener("click", e => {
+  if (entrega) return;
+  e.preventDefault();
+  abrirDatos(true);
+  $("f-aviso").hidden = false;
+  $("f-delivery").focus();
 });
 ["f-name", "f-sector"].forEach(id => $(id).addEventListener("input", actualizarBolsa));
 

@@ -206,7 +206,10 @@ let pegado = [];
 function leerPedidoPegado() {
   const texto = $("order-in").value;
   pegado = [];
-  texto.split(/\n/).forEach(linea => {
+  // Si el mensaje trae viñetas (•), solo se leen esas líneas, así el nombre o la dirección no se confunden con productos.
+  const lineas = texto.split(/\n/);
+  const conVineta = lineas.filter(l => /^\s*[•\-*]/.test(l));
+  (conVineta.length ? conVineta : lineas).forEach(linea => {
     const m = linea.match(/(\d+)\s*[×xX*]\s*(.+)$/);
     if (m) pegado.push({ qty: Number(m[1]), raw: m[2].trim(), id: porNombre[norm(m[2])] });
   });
@@ -222,7 +225,10 @@ $("order-in").addEventListener("input", () => { leerPedidoPegado(); $("confirm-m
 $("confirm-btn").addEventListener("click", async () => {
   if (!pegado.length) return;
   const btn = $("confirm-btn"); btn.disabled = true;
-  const cliente = (($("order-in").value.match(/Nombre:\s*(.+)/) || [])[1] || "").trim();
+  const texto = $("order-in").value;
+  const dato = re => ((texto.match(re) || [])[1] || "").trim();
+  const nombre = dato(/Nombre:\s*(.+)/), tipo = dato(/Entrega:\s*(.+)/), direccion = dato(/Direcci[oó]n:\s*(.+)/) || dato(/Entrega en:\s*(.+)/);
+  const cliente = [nombre, tipo ? tipo + (direccion ? ": " + direccion : "") : direccion].filter(Boolean).join(" · ");
   aviso("confirm-msg", "Guardando…", true);
   const r = await api({ action: "confirmarPedido", items: pegado.map(p => ({ id: p.id, qty: p.qty })), cliente });
   if (r.ok) { $("order-in").value = ""; leerPedidoPegado(); aviso("confirm-msg", "Pedido confirmado. Stock descontado.", true); }
