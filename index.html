@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Malibú Cookies · Talca</title>
-<meta name="description" content="Cookies rellenas hechas a mano y frutitas virales en Talca. Arma tu caja y pide por WhatsApp.">
+<meta name="description" content="Cookies rellenas hechas a mano, frutitas virales y tortas por encargo en Talca. Arma tu caja y pide por WhatsApp.">
 <meta property="og:title" content="Malibú Cookies">
-<meta property="og:description" content="Cookies rellenas hechas a mano y frutitas virales en Talca.">
+<meta property="og:description" content="Cookies rellenas hechas a mano, frutitas virales y tortas por encargo en Talca.">
 <meta property="og:image" content="img/logo.png">
 <link rel="icon" href="img/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
   <div class="wrap">
     <a class="brand" href="#inicio"><img class="ring" src="img/logo.png" alt="">Malibú Cookies</a>
     <nav class="links" aria-label="Secciones">
-      <a href="#menu">Menú</a><a href="#frutitas">Frutitas virales</a><a href="#pedir">Cómo pedir</a><a href="#nosotros">Nosotros</a>
+      <a href="#menu">Menú</a><a href="#frutitas">Frutitas virales</a><a href="#reposteria">Repostería</a><a href="#pedir">Cómo pedir</a><a href="#nosotros">Nosotros</a>
     </nav>
     <a class="btn btn-ink" href="#menu" id="order-link">Armar pedido</a>
   </div>
@@ -46,7 +46,7 @@
     </div>
   </section>
 
-  <nav class="strip" aria-label="Ir a una sección"><div class="wrap"><a href="#menu" data-tab="c">Clásicas</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="p">Premium</a><span aria-hidden="true">✦</span><a href="#frutitas">Frutitas virales</a><span aria-hidden="true">✦</span><a href="#entregas">Delivery en Talca</a></div></nav>
+  <nav class="strip" aria-label="Ir a una sección"><div class="wrap"><a href="#menu" data-tab="c">Clásicas</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="p">Premium</a><span aria-hidden="true">✦</span><a href="#frutitas">Frutitas virales</a><span aria-hidden="true">✦</span><a href="#reposteria">Repostería</a><span aria-hidden="true">✦</span><a href="#entregas">Delivery en Talca</a></div></nav>
 
   <section id="menu">
     <div class="wrap">
@@ -78,6 +78,47 @@
         <img src="img/frutitas-mesa.jpg" alt="Frutitas virales sobre una mesa de mármol">
         <img src="img/frutitas-duo.jpg" alt="Frutitas virales de cerca">
       </div>
+    </div>
+  </section>
+
+  <section class="reposteria" id="reposteria">
+    <div class="wrap repo">
+      <div class="repo-intro">
+        <div class="eyebrow">Por encargo</div>
+        <h2>Repostería</h2>
+        <p>Hacemos tortas por encargo. Elige aquí lo principal para que podamos organizarnos, y te respondemos por WhatsApp con el precio.</p>
+        <ul class="repo-puntos">
+          <li>Mini tortas y tortas comunes, con cobertura de crema o fondant.</li>
+          <li>El diseño tiene un valor agregado según su dificultad.</li>
+          <li>El precio te lo enviamos por WhatsApp.</li>
+        </ul>
+      </div>
+      <form class="card form repo-form" id="torta-form" novalidate>
+        <h3>Cotiza tu torta</h3>
+        <fieldset>
+          <legend>Tamaño</legend>
+          <div class="pills">
+            <label class="pill"><input type="radio" name="t-tamano" value="Mini torta"><span>Mini torta</span></label>
+            <label class="pill"><input type="radio" name="t-tamano" value="Torta común"><span>Torta común</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Cobertura</legend>
+          <div class="pills">
+            <label class="pill"><input type="radio" name="t-cobertura" value="Crema"><span>Crema</span></label>
+            <label class="pill"><input type="radio" name="t-cobertura" value="Fondant"><span>Fondant</span></label>
+          </div>
+        </fieldset>
+        <label for="t-relleno">Tipo de torta y relleno<textarea id="t-relleno" rows="2" maxlength="300" placeholder="hojarasca, bizcocho, panqueques"></textarea></label>
+        <label for="t-diseno">Diseño (opcional)<textarea id="t-diseno" rows="2" maxlength="400" placeholder="Colores, temática, nombre o edad"></textarea></label>
+        <p class="hint">Según la dificultad del diseño, hay un valor agregado.</p>
+        <div class="two">
+          <label for="t-fecha">¿Para qué fecha?<input type="date" id="t-fecha"></label>
+          <label for="t-nombre">Tu nombre<input id="t-nombre" autocomplete="name" maxlength="60"></label>
+        </div>
+        <p class="aviso" id="t-aviso" role="alert" hidden>Elige el tamaño y la cobertura para cotizar.</p>
+        <a class="btn btn-wa" id="t-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+      </form>
     </div>
   </section>
 
@@ -245,6 +286,45 @@ $("bag-wa").addEventListener("click", e => {
   $("f-delivery").focus();
 });
 ["f-name", "f-sector"].forEach(id => $(id).addEventListener("input", actualizarBolsa));
+
+// Repostería: arma el mensaje para cotizar una torta por WhatsApp.
+const isoDia = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+$("t-fecha").min = isoDia(new Date());
+function fechaLarga(iso) {
+  const [y, m, d] = String(iso).split("-").map(Number);
+  if (!y || !m || !d) return "";
+  const opciones = { weekday: "long", day: "numeric", month: "long" };
+  if (y !== new Date().getFullYear()) opciones.year = "numeric";
+  return new Date(y, m - 1, d).toLocaleDateString("es-CL", opciones);
+}
+const elegido = nombre => (document.querySelector(`input[name="${nombre}"]:checked`) || {}).value || "";
+function textoTorta() {
+  const campo = id => $(id).value.trim();
+  const datos = [
+    ["Tamaño", elegido("t-tamano")],
+    ["Cobertura", elegido("t-cobertura")],
+    ["Tipo de torta y relleno", campo("t-relleno")],
+    ["Diseño", campo("t-diseno")],
+    ["Fecha", fechaLarga(campo("t-fecha"))],
+    ["Nombre", campo("t-nombre")],
+  ].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`);
+  return "Hola Malibú! Quiero cotizar una torta:\n" + datos.join("\n");
+}
+function actualizarTorta() {
+  $("t-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(textoTorta())}`;
+  if (elegido("t-tamano") && elegido("t-cobertura")) $("t-aviso").hidden = true;
+}
+["input", "change"].forEach(ev => $("torta-form").addEventListener(ev, actualizarTorta));
+$("torta-form").addEventListener("submit", e => e.preventDefault());
+// Sin tamaño o cobertura, el botón muestra un aviso en vez de abrir WhatsApp.
+$("t-wa").addEventListener("click", e => {
+  const falta = !elegido("t-tamano") ? "t-tamano" : !elegido("t-cobertura") ? "t-cobertura" : "";
+  if (!falta) return;
+  e.preventDefault();
+  $("t-aviso").hidden = false;
+  document.querySelector(`input[name="${falta}"]`).focus();
+});
+actualizarTorta();
 
 async function cargar() {
   try {
