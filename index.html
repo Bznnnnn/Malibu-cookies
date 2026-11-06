@@ -112,8 +112,16 @@
         <label for="t-relleno">Tipo de torta y relleno<textarea id="t-relleno" rows="2" maxlength="300" placeholder="hojarasca, bizcocho, panqueques"></textarea></label>
         <label for="t-diseno">Diseño (opcional)<textarea id="t-diseno" rows="2" maxlength="400" placeholder="Colores, temática, nombre o edad"></textarea></label>
         <p class="hint">Según la dificultad del diseño, hay un valor agregado.</p>
+        <div class="refs">
+          <span class="refs-titulo">Imágenes de referencia (opcional)</span>
+          <input class="oculto" type="file" id="t-img" accept="image/*" multiple>
+          <label class="btn btn-ghost refs-btn" id="t-img-btn" for="t-img">Subir imágenes</label>
+          <ul class="refs-lista" id="t-img-lista"></ul>
+          <p class="refs-msg" id="t-img-msg" role="status"></p>
+          <p class="hint">Hasta 3 imágenes. Solo fotos o imágenes, sin documentos ni videos.</p>
+        </div>
         <div class="two">
-          <label for="t-fecha">¿Para qué fecha?<input type="date" id="t-fecha"></label>
+          <label for="t-fecha">Fecha de entrega<input type="date" id="t-fecha"></label>
           <label for="t-nombre">Tu nombre<input id="t-nombre" autocomplete="name" maxlength="60"></label>
         </div>
         <p class="aviso" id="t-aviso" role="alert" hidden>Elige el tamaño y la cobertura para cotizar.</p>
@@ -305,24 +313,95 @@ function textoTorta() {
     ["Cobertura", elegido("t-cobertura")],
     ["Tipo de torta y relleno", campo("t-relleno")],
     ["Diseño", campo("t-diseno")],
-    ["Fecha", fechaLarga(campo("t-fecha"))],
+    ["Fecha de entrega", fechaLarga(campo("t-fecha"))],
     ["Nombre", campo("t-nombre")],
   ].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`);
-  return "Hola Malibú! Quiero cotizar una torta:\n" + datos.join("\n");
+  const enlaces = imagenes.filter(im => im.estado === "lista").map(im => im.url);
+  return "Hola Malibú! Quiero cotizar una torta:\n" + datos.join("\n") + (enlaces.length ? "\n\nImágenes de referencia:\n" + enlaces.join("\n") : "");
 }
+const subiendoImgs = () => imagenes.some(im => im.estado === "subiendo");
 function actualizarTorta() {
   $("t-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(textoTorta())}`;
-  if (elegido("t-tamano") && elegido("t-cobertura")) $("t-aviso").hidden = true;
+  if (elegido("t-tamano") && elegido("t-cobertura") && !subiendoImgs()) $("t-aviso").hidden = true;
 }
+
+// Imágenes de referencia: se achican, se pasan a JPEG y se suben a la carpeta de Google Drive del negocio.
+const MAX_IMG = 3;
+const imagenes = []; // { previa, estado: "subiendo" | "lista" | "error", url }
+const avisoImg = texto => { $("t-img-msg").textContent = texto || ""; };
+function pintarImgs() {
+  const estado = { subiendo: "Subiendo…", lista: "Lista", error: "No se subió" };
+  $("t-img-lista").innerHTML = imagenes.map((im, i) => `<li class="${im.estado}"><img src="${esc(im.previa)}" alt="Imagen de referencia ${i + 1}"><span>${estado[im.estado]}</span><button type="button" data-quitar="${i}" aria-label="Quitar imagen ${i + 1}">×</button></li>`).join("");
+  const lleno = imagenes.length >= MAX_IMG;
+  $("t-img").disabled = lleno;
+  $("t-img-btn").classList.toggle("off", lleno);
+}
+function aJpeg(archivo, lado = 1600, calidad = 0.85) {
+  return new Promise((ok, mal) => {
+    const url = URL.createObjectURL(archivo), img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const k = Math.min(1, lado / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(img.naturalWidth * k));
+      c.height = Math.max(1, Math.round(img.naturalHeight * k));
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      ok(c.toDataURL("image/jpeg", calidad));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); mal(new Error("No pudimos leer esa imagen. Prueba con una foto JPG o PNG.")); };
+    img.src = url;
+  });
+}
+async function subirImagen(archivo, im) {
+  try {
+    const r = await Malibu.post({ action: "subirReferencia", imagen: await aJpeg(archivo) });
+    if (!r.ok) throw new Error(r.error === "sesion" ? "Por ahora no se pueden subir imágenes. Envíalas por WhatsApp." : (r.mensaje || "No se pudo subir la imagen."));
+    im.url = r.url;
+    im.estado = "lista";
+  } catch (err) {
+    im.estado = "error";
+    if (imagenes.includes(im)) avisoImg((err && err.message) || "No se pudo subir la imagen.");
+  }
+  pintarImgs();
+  actualizarTorta();
+}
+$("t-img").addEventListener("change", e => {
+  const archivos = [...e.target.files];
+  e.target.value = "";
+  let rechazadas = 0, sobran = 0;
+  for (const archivo of archivos) {
+    if (!/^image\//.test(archivo.type)) { rechazadas++; continue; }
+    if (imagenes.length >= MAX_IMG) { sobran++; continue; }
+    const im = { previa: URL.createObjectURL(archivo), estado: "subiendo" };
+    imagenes.push(im);
+    subirImagen(archivo, im);
+  }
+  avisoImg(rechazadas ? "Solo se pueden subir imágenes, sin documentos ni videos." : sobran ? `Puedes subir hasta ${MAX_IMG} imágenes.` : "");
+  pintarImgs();
+  actualizarTorta();
+});
+$("t-img-lista").addEventListener("click", e => {
+  const b = e.target.closest("[data-quitar]");
+  if (!b) return;
+  const [im] = imagenes.splice(Number(b.dataset.quitar), 1);
+  if (im) URL.revokeObjectURL(im.previa);
+  avisoImg("");
+  pintarImgs();
+  actualizarTorta();
+});
 ["input", "change"].forEach(ev => $("torta-form").addEventListener(ev, actualizarTorta));
 $("torta-form").addEventListener("submit", e => e.preventDefault());
-// Sin tamaño o cobertura, el botón muestra un aviso en vez de abrir WhatsApp.
+// Sin tamaño o cobertura, o con imágenes subiendo, el botón muestra un aviso en vez de abrir WhatsApp.
 $("t-wa").addEventListener("click", e => {
   const falta = !elegido("t-tamano") ? "t-tamano" : !elegido("t-cobertura") ? "t-cobertura" : "";
-  if (!falta) return;
+  if (!falta && !subiendoImgs()) return;
   e.preventDefault();
+  $("t-aviso").textContent = falta ? "Elige el tamaño y la cobertura para cotizar." : "Espera a que terminen de subir las imágenes.";
   $("t-aviso").hidden = false;
-  document.querySelector(`input[name="${falta}"]`).focus();
+  if (falta) document.querySelector(`input[name="${falta}"]`).focus();
 });
 actualizarTorta();
 

@@ -12,8 +12,13 @@
  *      Ejecutar como: Yo. Quién tiene acceso: Cualquier usuario.
  *   5. Copia la URL que termina en /exec y pégala en config.js de la página.
  *
- * La página pública solo puede LEER el catálogo. Todo cambio exige iniciar sesión
+ * La página pública solo puede LEER el catálogo y subir imágenes de referencia para
+ * cotizar tortas (solo JPEG, con un tope por hora). Todo cambio exige iniciar sesión
  * con un usuario y clave de la pestaña "Credenciales", que nunca sale de esta hoja.
+ *
+ * Para actualizar este código más adelante: pégalo, guarda y ve a Implementar >
+ * Administrar implementaciones > lápiz > Versión: Nueva versión > Implementar.
+ * Así la URL /exec sigue siendo la misma.
  */
 
 // ID de la hoja de cálculo (lo que va entre /d/ y /edit en su enlace).
@@ -24,6 +29,10 @@ const HOJA_PRODUCTOS = 'Productos';
 const HOJA_PEDIDOS = 'Pedidos';
 const HOJA_CRED = 'Credenciales';
 const CARPETA_FOTOS = 'Malibú Cookies - Fotos';
+const CARPETA_REFERENCIAS = 'Malibú Cookies - Referencias de tortas';
+const REF_MAX_BYTES = 2 * 1024 * 1024; // 2 MB por imagen
+const REF_MAX_HORA = 30;               // imágenes por hora, sumando a todos los clientes
+const REF_MAX_6H = 60;                 // imágenes cada 6 horas
 const CLAVE_INICIAL = 'CAMBIA-ESTA-CLAVE';
 const MAX_INTENTOS = 5;          // intentos fallidos antes de bloquear
 const BLOQUEO_SEG = 15 * 60;     // 15 minutos
@@ -112,6 +121,8 @@ function doPost(e) {
   }
   try {
     if (body.action === 'login') return json_(login_(body.usuario, body.clave));
+    // Público: imágenes de referencia para cotizar una torta.
+    if (body.action === 'subirReferencia') return json_(subirReferencia_(body.imagen));
 
     const usuario = validarSesion_(body.token);
     if (!usuario) return json_({ ok: false, error: 'sesion', mensaje: 'Tu sesión expiró. Vuelve a ingresar.' });
@@ -249,8 +260,56 @@ function guardarFoto_(base64, id) {
 }
 
 function carpetaFotos_() {
-  const it = DriveApp.getFoldersByName(CARPETA_FOTOS);
-  return it.hasNext() ? it.next() : DriveApp.createFolder(CARPETA_FOTOS);
+  return carpeta_(CARPETA_FOTOS);
+}
+
+function carpeta_(nombre) {
+  const it = DriveApp.getFoldersByName(nombre);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(nombre);
+}
+
+/* ------------------------------------------------------------------ */
+/* Imágenes de referencia para tortas (público)                        */
+/* ------------------------------------------------------------------ */
+
+function subirReferencia_(base64) {
+  const limpio = String(base64 || '').replace(/^data:image\/jpeg;base64,/, '');
+  if (!limpio) return { ok: false, mensaje: 'No llegó la imagen.' };
+  if (limpio.length > Math.ceil(REF_MAX_BYTES / 3) * 4) return { ok: false, mensaje: 'La imagen es muy pesada (máximo 2 MB).' };
+  let bytes;
+  try {
+    bytes = Utilities.base64Decode(limpio);
+  } catch (err) {
+    return { ok: false, mensaje: 'No se pudo leer la imagen.' };
+  }
+  // Solo se guardan JPEG: la página convierte cada imagen a JPEG antes de enviarla.
+  const esJpeg = bytes.length > 3 && (bytes[0] & 0xff) === 0xff && (bytes[1] & 0xff) === 0xd8 && (bytes[2] & 0xff) === 0xff;
+  if (!esJpeg) return { ok: false, mensaje: 'Solo se aceptan imágenes.' };
+  if (!hayCupoReferencias_()) return { ok: false, mensaje: 'Llegaron muchas imágenes en poco rato. Envíalas directo por WhatsApp.' };
+  const nombre = 'referencia-' + Utilities.formatDate(new Date(), 'America/Santiago', 'yyyyMMdd-HHmmss') + '-' + Math.floor(Math.random() * 9000 + 1000) + '.jpg';
+  const archivo = carpeta_(CARPETA_REFERENCIAS).createFile(Utilities.newBlob(bytes, 'image/jpeg', nombre));
+  archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return { ok: true, url: 'https://lh3.googleusercontent.com/d/' + archivo.getId() };
+}
+
+// Tope de subidas por hora y cada 6 horas, para que nadie pueda llenar el Drive.
+function hayCupoReferencias_() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return false;
+  try {
+    const cache = CacheService.getScriptCache();
+    const ahora = Date.now();
+    const kHora = 'refh:' + Math.floor(ahora / 3600000);
+    const k6h = 'ref6:' + Math.floor(ahora / 21600000);
+    const enHora = Number(cache.get(kHora) || 0);
+    const en6h = Number(cache.get(k6h) || 0);
+    if (enHora >= REF_MAX_HORA || en6h >= REF_MAX_6H) return false;
+    cache.put(kHora, String(enHora + 1), 3700);
+    cache.put(k6h, String(en6h + 1), 21600);
+    return true;
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /* ------------------------------------------------------------------ */
