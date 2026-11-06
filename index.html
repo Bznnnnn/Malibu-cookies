@@ -124,6 +124,7 @@
           <label for="t-fecha">Fecha de entrega<input type="date" id="t-fecha"></label>
           <label for="t-nombre">Tu nombre<input id="t-nombre" autocomplete="name" maxlength="60"></label>
         </div>
+        <p class="recordatorio" id="t-recordatorio" hidden>📎 Después de enviar el mensaje, adjunta también tus fotos en el chat de WhatsApp con el clip.</p>
         <p class="aviso" id="t-aviso" role="alert" hidden>Elige el tamaño y la cobertura para cotizar.</p>
         <a class="btn btn-wa" id="t-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
       </form>
@@ -316,13 +317,18 @@ function textoTorta() {
     ["Fecha de entrega", fechaLarga(campo("t-fecha"))],
     ["Nombre", campo("t-nombre")],
   ].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`);
+  // Con imágenes: van los enlaces y además se le recuerda al cliente adjuntar las fotos en el chat.
   const enlaces = imagenes.filter(im => im.estado === "lista").map(im => im.url);
-  return "Hola Malibú! Quiero cotizar una torta:\n" + datos.join("\n") + (enlaces.length ? "\n\nImágenes de referencia:\n" + enlaces.join("\n") : "");
+  let extra = "";
+  if (enlaces.length) extra = "\n\nImágenes de referencia:\n" + enlaces.join("\n") + "\n\n📎 Te envío también las fotos aquí en el chat.";
+  else if (imagenes.length) extra = "\n\n📎 Te envío las fotos de referencia aquí en el chat.";
+  return "Hola Malibú! Quiero cotizar una torta:\n" + datos.join("\n") + extra;
 }
 const subiendoImgs = () => imagenes.some(im => im.estado === "subiendo");
 function actualizarTorta() {
   $("t-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(textoTorta())}`;
   if (elegido("t-tamano") && elegido("t-cobertura") && !subiendoImgs()) $("t-aviso").hidden = true;
+  $("t-recordatorio").hidden = !imagenes.length;
 }
 
 // Imágenes de referencia: se achican, se pasan a JPEG y se suben a la carpeta de Google Drive del negocio.
@@ -399,7 +405,7 @@ $("t-wa").addEventListener("click", e => {
   const falta = !elegido("t-tamano") ? "t-tamano" : !elegido("t-cobertura") ? "t-cobertura" : "";
   if (!falta && !subiendoImgs()) return;
   e.preventDefault();
-  $("t-aviso").textContent = falta ? "Elige el tamaño y la cobertura para cotizar." : "Espera a que terminen de subir las imágenes.";
+  $("t-aviso").textContent = falta ? "Elige el tamaño y la cobertura para cotizar." : "Espera a que las imágenes terminen de subir.";
   $("t-aviso").hidden = false;
   if (falta) document.querySelector(`input[name="${falta}"]`).focus();
 });
