@@ -87,7 +87,7 @@
       <div class="steps">
         <div class="card step"><b>1</b><h3>Arma tu caja</h3><p>Elige sabores con el botón +. Puedes mezclar clásicas, premium y frutitas.</p></div>
         <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
-        <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
+        <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total final, con el envío si corresponde, y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
       </div>
       <div class="info">
         <div class="card" id="entregas">
@@ -134,6 +134,7 @@
       <label class="campo-nombre" for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
       <label id="f-sector-wrap" for="f-sector" hidden>Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
       <p class="nota" id="f-nota-retiro" hidden>Coordinamos el retiro contigo por WhatsApp.</p>
+      <p class="nota envio" id="f-nota-envio" hidden>La preorden no incluye el envío: depende de tu sector y te lo confirmamos por WhatsApp.</p>
       <pre id="bag-text"></pre>
     </div>
   </div>
@@ -159,7 +160,7 @@ function etiqueta(p) {
 }
 function tarjeta(p, num) {
   const q = carrito[p.id] || 0, n = quedan(p);
-  return `<div class="item${q ? " on" : ""}${n <= 0 ? " soldout" : ""}"><div class="plate">${num ? `<span class="num">${num}</span>` : ""}<img src="${fotoDe(p)}" alt="${esc(p.name)}" loading="lazy">${etiqueta(p)}</div><h3>${esc(p.name)}</h3><div class="qty"><button class="minus" type="button" data-s="${esc(p.id)}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><output>${q}</output><button class="add" type="button" data-s="${esc(p.id)}" data-d="1" aria-label="Agregar ${esc(p.name)}"${q >= n ? " disabled" : ""}>+</button></div></div>`;
+  return `<div class="item${q ? " on" : ""}${n <= 0 ? " soldout" : ""}"><div class="plate">${num ? `<span class="num">${num}</span>` : ""}<img src="${fotoDe(p)}" alt="${esc(p.name)}" loading="lazy">${etiqueta(p)}</div><h3>${esc(p.name)}</h3>${precioDe(p) ? `<p class="precio">${pesos(precioDe(p))}</p>` : ""}<div class="qty"><button class="minus" type="button" data-s="${esc(p.id)}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><output>${q}</output><button class="add" type="button" data-s="${esc(p.id)}" data-d="1" aria-label="Agregar ${esc(p.name)}"${q >= n ? " disabled" : ""}>+</button></div></div>`;
 }
 function pintar() {
   $("n-c").textContent = porSeccion(productos, "c").length;
@@ -192,20 +193,28 @@ document.querySelectorAll("[data-wa-saludo]").forEach(a => { a.href = `https://w
 let entrega = ""; // "Delivery" o "Retiro"
 
 function textoPedido() {
-  const lineas = Object.entries(carrito).filter(([id]) => porId[id]).map(([id, q]) => `• ${q} × ${porId[id].name}`);
+  const pares = Object.entries(carrito).filter(([id]) => porId[id]);
+  const lineas = pares.map(([id, q]) => {
+    const precio = precioDe(porId[id]);
+    return `• ${q} × ${porId[id].name}` + (precio ? ` (${pesos(q * precio)})` : "");
+  });
+  // Al final: cuántas cookies son y la preorden, que no incluye el envío.
+  const r = resumenPedido(pares, porId);
+  const cuenta = [`Total: ${r.conteoTotal}`];
+  if (r.total) cuenta.push(`Preorden: ${pesos(r.total)}` + (entrega === "Delivery" ? " (sin envío)" : ""));
   const nombre = $("f-name").value.trim(), sector = $("f-sector").value.trim();
   const datos = [];
   if (nombre) datos.push(`Nombre: ${nombre}`);
   if (entrega) datos.push(`Entrega: ${entrega}`);
   if (entrega === "Delivery" && sector) datos.push(`Dirección: ${sector}`);
-  return "Hola Malibú! Quiero hacer este pedido:\n" + lineas.join("\n") + (datos.length ? "\n\n" + datos.join("\n") : "");
+  return "Hola Malibú! Quiero hacer este pedido:\n" + lineas.join("\n") + "\n\n" + cuenta.join("\n") + (datos.length ? "\n\n" + datos.join("\n") : "");
 }
 function actualizarBolsa() {
   for (const id in carrito) if (!porId[id]) delete carrito[id];
-  const total = Object.values(carrito).reduce((a, b) => a + b, 0);
-  $("bag").hidden = !total;
-  $("bag-count").textContent = total + (total === 1 ? " producto" : " productos") + (entrega ? " · " + entrega : "");
-  $("bag-list").textContent = Object.keys(carrito).map(id => porId[id].name).join(", ");
+  const r = resumenPedido(Object.entries(carrito), porId);
+  $("bag").hidden = !r.unidades;
+  $("bag-count").textContent = r.conteo + (r.total ? " · " + pesos(r.total) : "");
+  $("bag-list").textContent = (entrega ? entrega + " · " : "") + Object.keys(carrito).map(id => porId[id].name).join(", ");
   const t = textoPedido();
   $("bag-text").textContent = t;
   $("bag-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(t)}`;
@@ -221,6 +230,7 @@ document.querySelectorAll('input[name="entrega"]').forEach(r => r.addEventListen
   const esDelivery = entrega === "Delivery";
   $("f-sector-wrap").hidden = !esDelivery;
   $("f-nota-retiro").hidden = esDelivery;
+  $("f-nota-envio").hidden = !esDelivery;
   $("bag-fields").classList.toggle("retiro", !esDelivery);
   $("f-aviso").hidden = true;
   actualizarBolsa();

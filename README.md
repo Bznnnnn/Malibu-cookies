@@ -4,7 +4,7 @@ Página de Malibú Cookies (Talca): menú de cookies y frutitas virales, pedidos
 
 - `index.html`: la tienda.
 - `admin.html`: panel de administración (usuario y clave).
-- `config.js`: URL de la aplicación web de Google Apps Script y número de WhatsApp.
+- `config.js`: URL de la aplicación web de Google Apps Script, número de WhatsApp y precios por sección (clásicas, premium y frutitas).
 - `comun.js`, `estilos.css`: código y estilos compartidos.
 - `img/`: fotos del menú y logo.
 - `apps-script/Codigo.gs`: script que va dentro de la hoja de Google (catálogo, stock, pedidos y credenciales).

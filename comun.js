@@ -4,6 +4,28 @@ const MALIBU_BASE = [["Menta","menta","c"],["Manjar","manjar","c"],["Reese's","r
 
 const MALIBU_SECCIONES = { c: "Cookies clásicas", p: "Cookies premium", f: "Frutitas virales" };
 
+// Precios por sección. Los que valen se cambian en config.js; estos quedan de respaldo.
+const MALIBU_PRECIOS_BASE = { c: 1500, p: 2000, f: 4000 };
+function precioDe(p) { const t = window.MALIBU_PRECIOS || {}; return Number(t[p?.cat] ?? MALIBU_PRECIOS_BASE[p?.cat]) || 0; }
+const pesos = n => "$" + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+// Cuenta cookies y frutitas de un pedido ([[id, cantidad], ...]) y suma la preorden, sin envío.
+function resumenPedido(pares, porId) {
+  let cookies = 0, frutitas = 0, total = 0;
+  for (const [id, q] of pares) {
+    const p = porId[id];
+    if (!p) continue;
+    if (p.cat === "f") frutitas += q; else cookies += q;
+    total += q * precioDe(p);
+  }
+  const partes = [];
+  if (cookies) partes.push(cookies + (cookies === 1 ? " cookie" : " cookies"));
+  if (frutitas) partes.push(frutitas + (frutitas === 1 ? " frutita" : " frutitas"));
+  const conteo = partes.join(" y ");
+  const unidades = cookies + frutitas;
+  return { unidades, total, conteo, conteoTotal: partes.length > 1 ? `${unidades} (${conteo})` : conteo };
+}
+
 const Malibu = {
   hayApi() { return /^https:\/\/script\.google(usercontent)?\.com\//.test(window.MALIBU_API || ""); },
 

@@ -5,3 +5,6 @@ window.MALIBU_API = "https://script.google.com/macros/s/AKfycbyNaQXAh4CI4pMgLVyy
 
 // Número de WhatsApp para pedidos, con código de país y sin el signo +.
 window.MALIBU_WHATSAPP = "56956014992";
+
+// Precio por unidad de cada sección, en pesos chilenos (c: clásicas, p: premium, f: frutitas).
+window.MALIBU_PRECIOS = { c: 1500, p: 2000, f: 4000 };

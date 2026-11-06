@@ -52,7 +52,7 @@
             <h3>Confirmar pedido pagado</h3>
             <p class="hint">Pega el mensaje de WhatsApp del cliente. Cuando el pago esté confirmado, toca el botón y el stock se descuenta.</p>
             <label for="order-in" class="hint" style="display:block;margin:0 0 6px">Mensaje del pedido</label>
-            <textarea id="order-in" placeholder="Hola Malibú! Quiero hacer este pedido:&#10;• 2 × Menta&#10;• 1 × Mango"></textarea>
+            <textarea id="order-in" placeholder="Hola Malibú! Quiero hacer este pedido:&#10;• 2 × Menta ($3.000)&#10;• 1 × Mango ($4.000)"></textarea>
             <ul class="parsed" id="parsed"></ul>
             <button class="btn btn-ink" type="button" id="confirm-btn" disabled>Pago confirmado: descontar stock</button>
             <p class="msg" id="confirm-msg" role="status"></p>
@@ -211,7 +211,10 @@ function leerPedidoPegado() {
   const conVineta = lineas.filter(l => /^\s*[•\-*]/.test(l));
   (conVineta.length ? conVineta : lineas).forEach(linea => {
     const m = linea.match(/(\d+)\s*[×xX*]\s*(.+)$/);
-    if (m) pegado.push({ qty: Number(m[1]), raw: m[2].trim(), id: porNombre[norm(m[2])] });
+    if (!m) return;
+    // Quita el precio del final de la línea, por ejemplo "Menta ($3.000)".
+    const nombre = m[2].replace(/\s*(\(\s*\$[\d.,\s]*\)|[:=—–-]\s*\$[\d.,\s]*)\s*$/, "").trim();
+    pegado.push({ qty: Number(m[1]), raw: nombre, id: porNombre[norm(nombre)] });
   });
   const malo = pegado.some(p => !p.id || quedan(porId[p.id]) < p.qty);
   $("parsed").innerHTML = pegado.map(p => {
@@ -219,6 +222,8 @@ function leerPedidoPegado() {
     const n = quedan(porId[p.id]);
     return `<li class="${n < p.qty ? "bad" : ""}"><span>${p.qty} × ${esc(porId[p.id].name)}</span><span>${n === Infinity ? "sin control de stock" : n < p.qty ? "Solo quedan " + n : "quedarán " + (n - p.qty)}</span></li>`;
   }).join("");
+  const r = resumenPedido(pegado.filter(p => p.id).map(p => [p.id, p.qty]), porId);
+  if (r.unidades) $("parsed").innerHTML += `<li class="sum"><span>Total: ${esc(r.conteoTotal)}</span><span>Preorden ${pesos(r.total)}</span></li>`;
   $("confirm-btn").disabled = !pegado.length || malo;
 }
 $("order-in").addEventListener("input", () => { leerPedidoPegado(); $("confirm-msg").textContent = ""; });
