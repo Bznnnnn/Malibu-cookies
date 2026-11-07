@@ -50,9 +50,9 @@
         <div class="tools">
           <div class="card">
             <h3>Confirmar pedido pagado</h3>
-            <p class="hint">Pega el mensaje de WhatsApp del cliente. Cuando el pago esté confirmado, toca el botón y el stock se descuenta.</p>
+            <p class="hint">Pega el mensaje de WhatsApp del cliente. Cuando el pago esté confirmado, toca el botón y el stock se descuenta. Las tortas se muestran con su precio, pero no descuentan stock.</p>
             <label for="order-in" class="hint" style="display:block;margin:0 0 6px">Mensaje del pedido</label>
-            <textarea id="order-in" placeholder="Hola Malibú! Quiero hacer este pedido:&#10;• 2 × Menta ($3.000)&#10;• 1 × Mango ($4.000)"></textarea>
+            <textarea id="order-in" placeholder="Hola Malibú! Quiero hacer este pedido:&#10;• 2 × Menta ($3.000)&#10;• 1 × Mango ($4.000)&#10;&#10;🎂 Torta de bizcocho · Manjar nuez · 20 porciones ($25.000 + diseño)"></textarea>
             <ul class="parsed" id="parsed"></ul>
             <button class="btn btn-ink" type="button" id="confirm-btn" disabled>Pago confirmado: descontar stock</button>
             <p class="msg" id="confirm-msg" role="status"></p>
@@ -202,14 +202,24 @@ $("add-form").addEventListener("submit", async e => {
 });
 
 /* ---------- pedidos ---------- */
-let pegado = [];
+let pegado = [], tortasPegadas = [];
 function leerPedidoPegado() {
   const texto = $("order-in").value;
   pegado = [];
-  // Si el mensaje trae viñetas (•), solo se leen esas líneas, así el nombre o la dirección no se confunden con productos.
   const lineas = texto.split(/\n/);
-  const conVineta = lineas.filter(l => /^\s*[•\-*]/.test(l));
-  (conVineta.length ? conVineta : lineas).forEach(linea => {
+  // Las tortas vienen en líneas que empiezan con 🎂 y sus detalles con "·". No descuentan stock: solo se muestran y suman.
+  tortasPegadas = lineas.filter(l => /^\s*🎂/.test(l)).map(l => {
+    const m = l.match(/\(\s*\$\s*([\d.]+)([^()]*)\)\s*$/);
+    return {
+      texto: l.replace(/^\s*🎂\s*/, "").replace(/\s*\([^()]*\)\s*$/, ""),
+      precio: m ? Number(m[1].replace(/\./g, "")) : 0,
+      masDiseno: m ? /\+\s*dise/i.test(m[2]) : /\+\s*dise/i.test(l),
+    };
+  });
+  const resto = lineas.filter(l => !/^\s*(🎂|·)/.test(l) && !/https?:\/\//.test(l));
+  // Si el mensaje trae viñetas (•), solo se leen esas líneas, así el nombre o la dirección no se confunden con productos.
+  const conVineta = resto.filter(l => /^\s*[•\-*]/.test(l));
+  (conVineta.length ? conVineta : resto).forEach(linea => {
     const m = linea.match(/(\d+)\s*[×xX*]\s*(.+)$/);
     if (!m) return;
     // Quita el precio del final de la línea, por ejemplo "Menta ($3.000)".
@@ -221,9 +231,9 @@ function leerPedidoPegado() {
     if (!p.id) return `<li class="bad"><span>${esc(p.raw)}</span><span>No está en el menú</span></li>`;
     const n = quedan(porId[p.id]);
     return `<li class="${n < p.qty ? "bad" : ""}"><span>${p.qty} × ${esc(porId[p.id].name)}</span><span>${n === Infinity ? "sin control de stock" : n < p.qty ? "Solo quedan " + n : "quedarán " + (n - p.qty)}</span></li>`;
-  }).join("");
-  const r = resumenPedido(pegado.filter(p => p.id).map(p => [p.id, p.qty]), porId);
-  if (r.unidades) $("parsed").innerHTML += `<li class="sum"><span>Total: ${esc(r.conteoTotal)}</span><span>Preorden ${pesos(r.total)}</span></li>`;
+  }).join("") + tortasPegadas.map(t => `<li class="torta"><span>🎂 ${esc(t.texto)}</span><span>${t.precio ? pesos(t.precio) + (t.masDiseno ? " + diseño" : "") + " · " : ""}no descuenta stock</span></li>`).join("");
+  const r = resumenPedido(pegado.filter(p => p.id).map(p => [p.id, p.qty]), porId, tortasPegadas);
+  if (r.unidades || r.tortas) $("parsed").innerHTML += `<li class="sum"><span>Total: ${esc(r.conteoTotal)}</span><span>Preorden ${pesos(r.total)}${r.masDiseno ? " + diseño" : ""}</span></li>`;
   $("confirm-btn").disabled = !pegado.length || malo;
 }
 $("order-in").addEventListener("input", () => { leerPedidoPegado(); $("confirm-msg").textContent = ""; });

@@ -9,8 +9,12 @@ const MALIBU_PRECIOS_BASE = { c: 1500, p: 2000, f: 4000 };
 function precioDe(p) { const t = window.MALIBU_PRECIOS || {}; return Number(t[p?.cat] ?? MALIBU_PRECIOS_BASE[p?.cat]) || 0; }
 const pesos = n => "$" + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-// Cuenta cookies y frutitas de un pedido ([[id, cantidad], ...]) y suma la preorden, sin envío.
-function resumenPedido(pares, porId) {
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+const listaY = partes => partes.length > 1 ? partes.slice(0, -1).join(", ") + " y " + partes[partes.length - 1] : partes.join("");
+
+// Cuenta cookies, frutitas y tortas de un pedido y suma la preorden, sin envío.
+// pares: [[id, cantidad], ...]; tortas: [{ precio, masDiseno }, ...], masDiseno si el diseño se cobra aparte.
+function resumenPedido(pares, porId, tortas = []) {
   let cookies = 0, frutitas = 0, total = 0;
   for (const [id, q] of pares) {
     const p = porId[id];
@@ -18,12 +22,17 @@ function resumenPedido(pares, porId) {
     if (p.cat === "f") frutitas += q; else cookies += q;
     total += q * precioDe(p);
   }
-  const partes = [];
-  if (cookies) partes.push(cookies + (cookies === 1 ? " cookie" : " cookies"));
-  if (frutitas) partes.push(frutitas + (frutitas === 1 ? " frutita" : " frutitas"));
-  const conteo = partes.join(" y ");
+  for (const t of tortas) total += Number(t.precio) || 0;
+  const galletas = [];
+  if (cookies) galletas.push(plural(cookies, "cookie", "cookies"));
+  if (frutitas) galletas.push(plural(frutitas, "frutita", "frutitas"));
   const unidades = cookies + frutitas;
-  return { unidades, total, conteo, conteoTotal: partes.length > 1 ? `${unidades} (${conteo})` : conteo };
+  const deTortas = tortas.length ? plural(tortas.length, "torta", "tortas") : "";
+  // conteo: "2 cookies, 1 frutita y 1 torta". conteoTotal: "3 (2 cookies y 1 frutita) y 1 torta".
+  const conteo = listaY(deTortas ? [...galletas, deTortas] : galletas);
+  const conteoGalletas = galletas.length > 1 ? `${unidades} (${galletas.join(" y ")})` : galletas.join("");
+  const conteoTotal = [conteoGalletas, deTortas].filter(Boolean).join(" y ");
+  return { unidades, tortas: tortas.length, total, masDiseno: tortas.some(t => t.masDiseno), conteo, conteoTotal };
 }
 
 const Malibu = {

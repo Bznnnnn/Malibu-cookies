@@ -19,7 +19,7 @@
   <div class="wrap">
     <a class="brand" href="#inicio"><img class="ring" src="img/logo.png" alt="">Malibú Cookies</a>
     <nav class="links" aria-label="Secciones">
-      <a href="#menu">Menú</a><a href="#frutitas">Frutitas virales</a><a href="#reposteria">Repostería</a><a href="#pedir">Cómo pedir</a><a href="#nosotros">Nosotros</a>
+      <a href="#menu">Menú</a><a href="#menu" data-tab="f">Frutitas virales</a><a href="#menu" data-tab="t">Tortas</a><a href="#pedir">Cómo pedir</a><a href="#nosotros">Nosotros</a>
     </nav>
     <a class="btn btn-ink" href="#menu" id="order-link">Armar pedido</a>
   </div>
@@ -31,7 +31,7 @@
       <div>
         <div class="eyebrow">By Helen Villanueva · Talca</div>
         <h1><span>Cookies rellenas y hechas a mano</span>Cookies Malibú</h1>
-        <p class="lead">Sabores clásicos, premium y las frutitas virales que todos quieren probar. Arma tu caja y envíanos el pedido por WhatsApp.</p>
+        <p class="lead">Sabores clásicos, premium, las frutitas virales que todos quieren probar y tortas por encargo. Arma tu pedido y envíalo por WhatsApp.</p>
         <div class="ctas">
           <a class="btn btn-ink" href="#menu">Ver el menú</a>
           <a class="btn btn-ghost" href="https://wa.me/56956014992?text=Hola%20Malib%C3%BA%2C%20me%20gustar%C3%ADa%20saber%20qu%C3%A9%20productos%20tienes%20disponibles%20%E2%9C%A8%F0%9F%92%96" data-wa-saludo target="_blank" rel="noopener">WhatsApp</a>
@@ -46,7 +46,7 @@
     </div>
   </section>
 
-  <nav class="strip" aria-label="Ir a una sección"><div class="wrap"><a href="#menu" data-tab="c">Clásicas</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="p">Premium</a><span aria-hidden="true">✦</span><a href="#frutitas">Frutitas virales</a><span aria-hidden="true">✦</span><a href="#reposteria">Repostería</a><span aria-hidden="true">✦</span><a href="#entregas">Delivery en Talca</a></div></nav>
+  <nav class="strip" aria-label="Ir a una sección"><div class="wrap"><a href="#menu" data-tab="c">Clásicas</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="p">Premium</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="f">Frutitas virales</a><span aria-hidden="true">✦</span><a href="#menu" data-tab="t">Tortas</a><span aria-hidden="true">✦</span><a href="#entregas">Delivery en Talca</a></div></nav>
 
   <section id="menu">
     <div class="wrap">
@@ -54,80 +54,95 @@
         <div>
           <div class="eyebrow">Cookies Malibú</div>
           <h2>Menú</h2>
-          <p>Toca + en las que quieras. Cuando tengas tu caja lista, envíanos el pedido por WhatsApp.</p>
+          <p>Toca + en lo que quieras y arma tu torta paso a paso. Al final envías todo en un solo pedido por WhatsApp.</p>
         </div>
         <div class="tabs" role="tablist" aria-label="Categoría">
           <button role="tab" id="tab-c" aria-selected="true" data-cat="c">Clásicas<small id="n-c"></small></button>
           <button role="tab" id="tab-p" aria-selected="false" data-cat="p">Premium<small id="n-p"></small></button>
+          <button role="tab" id="tab-f" aria-selected="false" data-cat="f">Frutitas<small id="n-f"></small></button>
+          <button role="tab" id="tab-t" aria-selected="false" data-cat="t">Tortas</button>
         </div>
       </div>
+
       <div class="grid" id="grid"><p class="loading">Cargando el menú…</p></div>
-    </div>
-  </section>
 
-  <section class="frutitas" id="frutitas">
-    <div class="wrap fr">
-      <div>
-        <div class="eyebrow">Nuevo</div>
-        <h2>Frutitas virales</h2>
-        <p>Postres con forma de fruta, pintados a mano uno por uno y servidos sobre base dorada. Elige tus sabores y cuántas quieres de cada uno.</p>
-        <div class="fr-grid" id="fr-grid"><p class="loading">Cargando…</p></div>
+      <div class="fr" id="panel-f" hidden>
+        <div>
+          <p class="panel-intro">Postres con forma de fruta, pintados a mano uno por uno y servidos sobre base dorada. Elige tus sabores y cuántas quieres de cada uno.</p>
+          <div class="fr-grid" id="fr-grid"><p class="loading">Cargando…</p></div>
+        </div>
+        <div class="mosaic">
+          <img src="img/frutitas.jpg" alt="Frutitas virales sobre bases doradas" loading="lazy">
+          <img src="img/frutitas-mesa.jpg" alt="Frutitas virales sobre una mesa de mármol" loading="lazy">
+          <img src="img/frutitas-duo.jpg" alt="Frutitas virales de cerca" loading="lazy">
+        </div>
       </div>
-      <div class="mosaic">
-        <img src="img/frutitas.jpg" alt="Frutitas virales sobre bases doradas">
-        <img src="img/frutitas-mesa.jpg" alt="Frutitas virales sobre una mesa de mármol">
-        <img src="img/frutitas-duo.jpg" alt="Frutitas virales de cerca">
-      </div>
-    </div>
-  </section>
 
-  <section class="reposteria" id="reposteria">
-    <div class="wrap repo">
-      <div class="repo-intro">
-        <div class="eyebrow">Por encargo</div>
-        <h2>Repostería</h2>
-        <p>Hacemos tortas por encargo. Elige aquí lo principal para que podamos organizarnos, y te respondemos por WhatsApp con el precio.</p>
-        <ul class="repo-puntos">
-          <li>Mini tortas y tortas comunes, con cobertura de crema o fondant.</li>
-          <li>El diseño tiene un valor agregado según su dificultad.</li>
-          <li>El precio te lo enviamos por WhatsApp.</li>
-        </ul>
+      <div class="tortas" id="panel-t" hidden>
+        <div class="tortas-intro">
+          <h3>Tortas por encargo</h3>
+          <p>Elige paso a paso y mira el presupuesto mientras armas tu torta. Después se suma a tu pedido junto con tus cookies y frutitas.</p>
+          <ul class="puntos">
+            <li>Tortas de bizcocho y de hojarasca, de 10 a 40 porciones.</li>
+            <li>Mini tortas con el diseño incluido en el precio.</li>
+            <li>Cobertura de crema o fondant.</li>
+            <li>En las tortas de bizcocho y de hojarasca, el diseño se cotiza aparte según su dificultad.</li>
+          </ul>
+        </div>
+
+        <form class="card form armar" id="torta-form" novalidate>
+          <h3>Arma tu torta</h3>
+          <fieldset class="paso" id="paso-tipo">
+            <legend><b>1</b>Tipo de torta</legend>
+            <div class="pills">
+              <label class="pill"><input type="radio" name="t-tipo" value="bizcocho"><span>Bizcocho</span></label>
+              <label class="pill"><input type="radio" name="t-tipo" value="hojarasca"><span>Hojarasca</span></label>
+              <label class="pill"><input type="radio" name="t-tipo" value="mini"><span>Mini torta</span></label>
+            </div>
+          </fieldset>
+          <div class="paso" id="paso-sabor" hidden>
+            <label for="t-sabor"><span class="paso-titulo"><b>2</b>Sabor</span><select id="t-sabor"></select></label>
+          </div>
+          <fieldset class="paso" id="paso-tamano" hidden>
+            <legend><b>3</b><span id="t-tamano-titulo">Tamaño</span></legend>
+            <div class="opciones" id="t-tamanos"></div>
+          </fieldset>
+          <fieldset class="paso" id="paso-cobertura" hidden>
+            <legend><b>4</b>Cobertura</legend>
+            <div class="pills" id="t-coberturas"></div>
+          </fieldset>
+          <fieldset class="paso" id="paso-diseno" hidden>
+            <legend><b>5</b>Diseño</legend>
+            <div class="paso-cuerpo">
+              <div class="opciones dos" id="t-niveles" hidden></div>
+              <label for="t-diseno">Cuéntanos tu idea (opcional)<textarea id="t-diseno" rows="2" maxlength="400" placeholder="Colores, temática, nombre o edad"></textarea></label>
+              <div class="refs">
+                <span class="refs-titulo">Imágenes de referencia (opcional)</span>
+                <input class="oculto" type="file" id="t-img" accept="image/*" multiple>
+                <label class="btn btn-ghost refs-btn" id="t-img-btn" for="t-img">Subir imágenes</label>
+                <ul class="refs-lista" id="t-img-lista"></ul>
+                <p class="refs-msg" id="t-img-msg" role="status"></p>
+                <p class="hint">Hasta 3 imágenes. Solo fotos o imágenes, sin documentos ni videos.</p>
+              </div>
+              <p class="recordatorio" id="t-recordatorio" hidden>📎 Cuando envíes el pedido, adjunta también estas fotos en el chat de WhatsApp con el clip.</p>
+            </div>
+          </fieldset>
+          <div class="presupuesto" aria-live="polite">
+            <span>Presupuesto</span>
+            <strong id="t-precio">—</strong>
+            <p class="resumen" id="t-resumen" hidden></p>
+            <small id="t-nota">Elige el tipo de torta para empezar.</small>
+          </div>
+          <p class="aviso" id="t-aviso" role="alert" hidden></p>
+          <button class="btn btn-ink" type="submit" id="t-agregar">Agregar torta al pedido</button>
+          <p class="t-ok" id="t-ok" role="status"></p>
+        </form>
+
+        <div class="mis-tortas" id="mis-tortas" hidden>
+          <h3>Tortas en tu pedido</h3>
+          <ul id="t-lista"></ul>
+        </div>
       </div>
-      <form class="card form repo-form" id="torta-form" novalidate>
-        <h3>Cotiza tu torta</h3>
-        <fieldset>
-          <legend>Tamaño</legend>
-          <div class="pills">
-            <label class="pill"><input type="radio" name="t-tamano" value="Mini torta"><span>Mini torta</span></label>
-            <label class="pill"><input type="radio" name="t-tamano" value="Torta común"><span>Torta común</span></label>
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend>Cobertura</legend>
-          <div class="pills">
-            <label class="pill"><input type="radio" name="t-cobertura" value="Crema"><span>Crema</span></label>
-            <label class="pill"><input type="radio" name="t-cobertura" value="Fondant"><span>Fondant</span></label>
-          </div>
-        </fieldset>
-        <label for="t-relleno">Tipo de torta y relleno<textarea id="t-relleno" rows="2" maxlength="300" placeholder="hojarasca, bizcocho, panqueques"></textarea></label>
-        <label for="t-diseno">Diseño (opcional)<textarea id="t-diseno" rows="2" maxlength="400" placeholder="Colores, temática, nombre o edad"></textarea></label>
-        <p class="hint">Según la dificultad del diseño, hay un valor agregado.</p>
-        <div class="refs">
-          <span class="refs-titulo">Imágenes de referencia (opcional)</span>
-          <input class="oculto" type="file" id="t-img" accept="image/*" multiple>
-          <label class="btn btn-ghost refs-btn" id="t-img-btn" for="t-img">Subir imágenes</label>
-          <ul class="refs-lista" id="t-img-lista"></ul>
-          <p class="refs-msg" id="t-img-msg" role="status"></p>
-          <p class="hint">Hasta 3 imágenes. Solo fotos o imágenes, sin documentos ni videos.</p>
-        </div>
-        <div class="two">
-          <label for="t-fecha">Fecha de entrega<input type="date" id="t-fecha"></label>
-          <label for="t-nombre">Tu nombre<input id="t-nombre" autocomplete="name" maxlength="60"></label>
-        </div>
-        <p class="recordatorio" id="t-recordatorio" hidden>📎 Después de enviar el mensaje, adjunta también tus fotos en el chat de WhatsApp con el clip.</p>
-        <p class="aviso" id="t-aviso" role="alert" hidden>Elige el tamaño y la cobertura para cotizar.</p>
-        <a class="btn btn-wa" id="t-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-      </form>
     </div>
   </section>
 
@@ -135,9 +150,9 @@
     <div class="wrap">
       <div class="sec-head"><div><div class="eyebrow">Fácil y rápido</div><h2>Cómo pedir</h2></div></div>
       <div class="steps">
-        <div class="card step"><b>1</b><h3>Arma tu caja</h3><p>Elige sabores con el botón +. Puedes mezclar clásicas, premium y frutitas.</p></div>
-        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
-        <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total final, con el envío si corresponde, y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
+        <div class="card step"><b>1</b><h3>Arma tu pedido</h3><p>Elige cookies y frutitas con el botón + y arma tu torta en la pestaña Tortas. Todo va en un solo pedido.</p></div>
+        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y la fecha de entrega, y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
+        <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total final, con el envío y el diseño de la torta si corresponde, y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
       </div>
       <div class="info">
         <div class="card" id="entregas">
@@ -181,10 +196,12 @@
         <label class="opt" for="f-retiro"><input type="radio" name="entrega" value="Retiro" id="f-retiro"><span>Retiro</span></label>
       </div>
       <p class="aviso" id="f-aviso" role="alert" hidden>Elige delivery o retiro para enviar tu pedido.</p>
-      <label class="campo-nombre" for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
-      <label id="f-sector-wrap" for="f-sector" hidden>Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
+      <label for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
+      <label for="f-fecha">Fecha de entrega<input type="date" id="f-fecha"></label>
+      <label class="ancho" id="f-sector-wrap" for="f-sector" hidden>Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
       <p class="nota" id="f-nota-retiro" hidden>Coordinamos el retiro contigo por WhatsApp.</p>
-      <p class="nota envio" id="f-nota-envio" hidden>La preorden no incluye el envío: depende de tu sector y te lo confirmamos por WhatsApp.</p>
+      <p class="nota" id="f-nota-envio" hidden>La preorden no incluye el envío: depende de tu sector y te lo confirmamos por WhatsApp.</p>
+      <p class="nota fotos" id="f-fotos" hidden>📎 Después de enviar el mensaje, adjunta también tus fotos de referencia en el chat de WhatsApp con el clip.</p>
       <pre id="bag-text"></pre>
     </div>
   </div>
@@ -192,6 +209,7 @@
 
 <script src="config.js"></script>
 <script src="comun.js"></script>
+<script src="tortas.js"></script>
 <script>
 let productos = [];
 let porId = {}, porNombre = {};
@@ -213,9 +231,8 @@ function tarjeta(p, num) {
   return `<div class="item${q ? " on" : ""}${n <= 0 ? " soldout" : ""}"><div class="plate">${num ? `<span class="num">${num}</span>` : ""}<img src="${fotoDe(p)}" alt="${esc(p.name)}" loading="lazy">${etiqueta(p)}</div><h3>${esc(p.name)}</h3>${precioDe(p) ? `<p class="precio">${pesos(precioDe(p))}</p>` : ""}<div class="qty"><button class="minus" type="button" data-s="${esc(p.id)}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><output>${q}</output><button class="add" type="button" data-s="${esc(p.id)}" data-d="1" aria-label="Agregar ${esc(p.name)}"${q >= n ? " disabled" : ""}>+</button></div></div>`;
 }
 function pintar() {
-  $("n-c").textContent = porSeccion(productos, "c").length;
-  $("n-p").textContent = porSeccion(productos, "p").length;
-  $("grid").innerHTML = porSeccion(productos, seccion).map((p, i) => tarjeta(p, seccion === "c" ? i + 1 : "P" + (i + 1))).join("") || `<p class="loading">Pronto habrá sabores aquí.</p>`;
+  for (const c of ["c", "p", "f"]) $("n-" + c).textContent = porSeccion(productos, c).length;
+  if (seccion === "c" || seccion === "p") $("grid").innerHTML = porSeccion(productos, seccion).map((p, i) => tarjeta(p, seccion === "c" ? i + 1 : "P" + (i + 1))).join("") || `<p class="loading">Pronto habrá sabores aquí.</p>`;
   $("fr-grid").innerHTML = porSeccion(productos, "f").map(p => tarjeta(p)).join("") || `<p class="loading">Pronto habrá frutitas aquí.</p>`;
 }
 document.addEventListener("click", e => {
@@ -227,78 +244,35 @@ document.addEventListener("click", e => {
   if (!carrito[id]) delete carrito[id];
   pintar(); actualizarBolsa();
 });
+
+// Pestañas del menú: clásicas y premium usan la grilla; frutitas y tortas tienen su propio panel.
 function elegirSeccion(c) {
   seccion = c;
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.cat === c));
+  $("grid").hidden = c === "f" || c === "t";
+  $("panel-f").hidden = c !== "f";
+  $("panel-t").hidden = c !== "t";
   if (productos.length) pintar();
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => elegirSeccion(b.dataset.cat)));
-// Enlaces de la barra azul: llevan a la sección y eligen la pestaña que corresponde.
-document.querySelectorAll(".strip a[data-tab]").forEach(a => a.addEventListener("click", () => elegirSeccion(a.dataset.tab)));
+// Enlaces del encabezado y de la barra azul: llevan al menú y eligen la pestaña que corresponde.
+document.querySelectorAll("a[data-tab]").forEach(a => a.addEventListener("click", () => elegirSeccion(a.dataset.tab)));
+// Enlaces desde afuera, como malibucookies.cl/#tortas, abren esa pestaña.
+const PESTANA_DE = { "#clasicas": "c", "#premium": "p", "#frutitas": "f", "#tortas": "t", "#reposteria": "t" };
+function pestanaDelEnlace() {
+  const c = PESTANA_DE[location.hash.toLowerCase()];
+  if (!c) return;
+  elegirSeccion(c);
+  $("menu").scrollIntoView();
+}
+window.addEventListener("hashchange", pestanaDelEnlace);
+pestanaDelEnlace();
 
 // Botones generales de WhatsApp: abren el chat con un saludo.
 const SALUDO = "Hola Malibú, me gustaría saber qué productos tienes disponibles ✨💖";
 document.querySelectorAll("[data-wa-saludo]").forEach(a => { a.href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(SALUDO)}`; });
 
-let entrega = ""; // "Delivery" o "Retiro"
-
-function textoPedido() {
-  const pares = Object.entries(carrito).filter(([id]) => porId[id]);
-  const lineas = pares.map(([id, q]) => {
-    const precio = precioDe(porId[id]);
-    return `• ${q} × ${porId[id].name}` + (precio ? ` (${pesos(q * precio)})` : "");
-  });
-  // Al final: cuántas cookies son y la preorden, que no incluye el envío.
-  const r = resumenPedido(pares, porId);
-  const cuenta = [`Total: ${r.conteoTotal}`];
-  if (r.total) cuenta.push(`Preorden: ${pesos(r.total)}` + (entrega === "Delivery" ? " (sin envío)" : ""));
-  const nombre = $("f-name").value.trim(), sector = $("f-sector").value.trim();
-  const datos = [];
-  if (nombre) datos.push(`Nombre: ${nombre}`);
-  if (entrega) datos.push(`Entrega: ${entrega}`);
-  if (entrega === "Delivery" && sector) datos.push(`Dirección: ${sector}`);
-  return "Hola Malibú! Quiero hacer este pedido:\n" + lineas.join("\n") + "\n\n" + cuenta.join("\n") + (datos.length ? "\n\n" + datos.join("\n") : "");
-}
-function actualizarBolsa() {
-  for (const id in carrito) if (!porId[id]) delete carrito[id];
-  const r = resumenPedido(Object.entries(carrito), porId);
-  $("bag").hidden = !r.unidades;
-  $("bag-count").textContent = r.conteo + (r.total ? " · " + pesos(r.total) : "");
-  $("bag-list").textContent = (entrega ? entrega + " · " : "") + Object.keys(carrito).map(id => porId[id].name).join(", ");
-  const t = textoPedido();
-  $("bag-text").textContent = t;
-  $("bag-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(t)}`;
-}
-function abrirDatos(abrir) {
-  const abierto = $("bag").classList.toggle("open", abrir);
-  $("bag-toggle").textContent = abierto ? "Cerrar" : "Datos";
-}
-$("bag-toggle").addEventListener("click", () => abrirDatos(!$("bag").classList.contains("open")));
-
-document.querySelectorAll('input[name="entrega"]').forEach(r => r.addEventListener("change", () => {
-  entrega = r.value;
-  const esDelivery = entrega === "Delivery";
-  $("f-sector-wrap").hidden = !esDelivery;
-  $("f-nota-retiro").hidden = esDelivery;
-  $("f-nota-envio").hidden = !esDelivery;
-  $("bag-fields").classList.toggle("retiro", !esDelivery);
-  $("f-aviso").hidden = true;
-  actualizarBolsa();
-}));
-
-// Sin elegir delivery o retiro, el botón abre los datos en vez de ir a WhatsApp.
-$("bag-wa").addEventListener("click", e => {
-  if (entrega) return;
-  e.preventDefault();
-  abrirDatos(true);
-  $("f-aviso").hidden = false;
-  $("f-delivery").focus();
-});
-["f-name", "f-sector"].forEach(id => $(id).addEventListener("input", actualizarBolsa));
-
-// Repostería: arma el mensaje para cotizar una torta por WhatsApp.
 const isoDia = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-$("t-fecha").min = isoDia(new Date());
 function fechaLarga(iso) {
   const [y, m, d] = String(iso).split("-").map(Number);
   if (!y || !m || !d) return "";
@@ -307,33 +281,191 @@ function fechaLarga(iso) {
   return new Date(y, m - 1, d).toLocaleDateString("es-CL", opciones);
 }
 const elegido = nombre => (document.querySelector(`input[name="${nombre}"]:checked`) || {}).value || "";
-function textoTorta() {
-  const campo = id => $(id).value.trim();
-  const datos = [
-    ["Tamaño", elegido("t-tamano")],
-    ["Cobertura", elegido("t-cobertura")],
-    ["Tipo de torta y relleno", campo("t-relleno")],
-    ["Diseño", campo("t-diseno")],
-    ["Fecha de entrega", fechaLarga(campo("t-fecha"))],
-    ["Nombre", campo("t-nombre")],
-  ].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`);
-  // Con imágenes: van los enlaces y además se le recuerda al cliente adjuntar las fotos en el chat.
-  const enlaces = imagenes.filter(im => im.estado === "lista").map(im => im.url);
-  let extra = "";
-  if (enlaces.length) extra = "\n\nImágenes de referencia:\n" + enlaces.join("\n") + "\n\n📎 Te envío también las fotos aquí en el chat.";
-  else if (imagenes.length) extra = "\n\n📎 Te envío las fotos de referencia aquí en el chat.";
-  return "Hola Malibú! Quiero cotizar una torta:\n" + datos.join("\n") + extra;
+
+/* ---------- Tortas: se arman paso a paso con el menú de tortas.js ---------- */
+const MENU_TORTAS = window.MALIBU_TORTAS || null;
+const TIPO_TORTA = { bizcocho: "Torta de bizcocho", hojarasca: "Torta de hojarasca", mini: "Mini torta" };
+const tortas = []; // tortas agregadas al pedido
+// Sabores de cada tipo: sabor -> { grupo, precios } (precios según las porciones del menú).
+const SABORES = { bizcocho: new Map(), hojarasca: new Map(), mini: new Map() };
+if (MENU_TORTAS) {
+  for (const [grupo, sabores] of Object.entries(MENU_TORTAS.bizcocho || {}))
+    for (const [sabor, precios] of Object.entries(sabores)) SABORES.bizcocho.set(sabor, { grupo, precios });
+  for (const [sabor, precios] of Object.entries(MENU_TORTAS.hojarasca || {})) SABORES.hojarasca.set(sabor, { precios });
+  for (const sabor of (MENU_TORTAS.mini || {}).sabores || []) SABORES.mini.set(sabor, {});
 }
-const subiendoImgs = () => imagenes.some(im => im.estado === "subiendo");
-function actualizarTorta() {
-  $("t-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(textoTorta())}`;
-  if (elegido("t-tamano") && elegido("t-cobertura") && !subiendoImgs()) $("t-aviso").hidden = true;
+const minimo = lista => Math.min(...lista.map(Number).filter(n => n > 0));
+const DISENOS_MINI = MENU_TORTAS ? (MENU_TORTAS.mini || {}).disenos || [] : [];
+
+function armado() {
+  const tipo = elegido("t-tipo"), sabor = $("t-sabor").value;
+  const info = (SABORES[tipo] && SABORES[tipo].get(sabor)) || null;
+  return { tipo, sabor: info ? sabor : "", info, tam: elegido("t-tamano"), cobertura: elegido("t-cobertura"), nivel: elegido("t-nivel") };
+}
+// Presupuesto de la torta que se está armando. Las mini tortas ya incluyen el diseño; las demás no.
+function presupuesto(a) {
+  if (a.tipo === "mini") {
+    const d = DISENOS_MINI[Number(a.nivel)];
+    if (a.nivel !== "" && d) return { precio: Number(d[1]) || 0, texto: pesos(d[1]), nota: "Mini torta con el diseño incluido." };
+    const desde = minimo(DISENOS_MINI.map(x => x[1]));
+    return { texto: isFinite(desde) ? "desde " + pesos(desde) : "—", nota: "El valor depende del diseño que elijas en el paso 5." };
+  }
+  if (!a.tipo) return { texto: "—", nota: "Elige el tipo de torta para empezar." };
+  if (!a.sabor) {
+    const desde = minimo([...SABORES[a.tipo].values()].map(i => minimo(i.precios)));
+    return { texto: isFinite(desde) ? "desde " + pesos(desde) : "—", nota: "El precio depende del sabor y del tamaño." };
+  }
+  if (a.tam === "") {
+    const desde = minimo(a.info.precios);
+    return { texto: isFinite(desde) ? "desde " + pesos(desde) : "—", nota: "Elige el tamaño para ver el precio." };
+  }
+  const precio = Number(a.info.precios[Number(a.tam)]) || 0;
+  if (!precio) return { precio: 0, texto: "Por confirmar", nota: "Te confirmamos el precio de este tamaño por WhatsApp." };
+  return { precio, texto: pesos(precio) + " + diseño", nota: "El diseño se cotiza aparte según su dificultad. Te confirmamos el valor por WhatsApp." };
+}
+const tamanoTexto = (tipo, tam) => tipo === "mini" ? `bizcocho de ${tam.toLowerCase()}` : `${MENU_TORTAS.porciones[Number(tam)]} porciones`;
+const nombreTorta = t => [TIPO_TORTA[t.tipo], t.sabor, t.tamano].filter(Boolean).join(" · ");
+const precioTorta = t => !t.precio ? "precio por confirmar" + (t.masDiseno ? " + diseño" : "") : pesos(t.precio) + (t.masDiseno ? " + diseño" : ", diseño incluido");
+
+function llenarSabores(tipo) {
+  const opcion = (sabor, info) => {
+    const desde = info.precios ? minimo(info.precios) : NaN;
+    return `<option value="${esc(sabor)}">${esc(sabor)}${isFinite(desde) ? ` · desde ${pesos(desde)}` : ""}</option>`;
+  };
+  let html = `<option value="">Elige un sabor</option>`;
+  if (tipo === "bizcocho") {
+    const grupos = new Map();
+    for (const [sabor, info] of SABORES.bizcocho) {
+      if (!grupos.has(info.grupo)) grupos.set(info.grupo, []);
+      grupos.get(info.grupo).push(opcion(sabor, info));
+    }
+    for (const [grupo, ops] of grupos) html += `<optgroup label="${esc(grupo)}">${ops.join("")}</optgroup>`;
+  } else if (SABORES[tipo]) {
+    for (const [sabor, info] of SABORES[tipo]) html += opcion(sabor, info);
+  }
+  $("t-sabor").innerHTML = html;
+  $("t-sabor").value = "";
+}
+// Paso 3: porciones con su precio, o el bizcocho en las mini tortas. Mantiene lo elegido si sigue existiendo.
+function llenarTamanos() {
+  const { tipo, info, tam } = armado();
+  const radio = (valor, contenido) => `<label class="opcion"><input type="radio" name="t-tamano" value="${esc(valor)}"${valor === tam ? " checked" : ""}><span>${contenido}</span></label>`;
+  let html = "";
+  if (tipo === "mini") html = ((MENU_TORTAS.mini || {}).bizcochos || []).map(b => radio(b, esc(b))).join("");
+  else if (tipo) html = MENU_TORTAS.porciones.map((n, i) => {
+    const precio = info ? Number(info.precios[i]) : 0;
+    return radio(String(i), `<em>${esc(n)}</em> <i>porciones</i>${info ? ` <small>${precio ? pesos(precio) : "Consultar"}</small>` : ""}`);
+  }).join("");
+  $("t-tamano-titulo").textContent = tipo === "mini" ? "Bizcocho" : "Tamaño";
+  $("t-tamanos").className = "opciones " + (tipo === "mini" ? "dos" : "porciones");
+  $("t-tamanos").innerHTML = html;
+}
+function cambiarTipo() {
+  llenarSabores(elegido("t-tipo"));
+  $("t-tamanos").innerHTML = "";
+  document.querySelectorAll('input[name="t-nivel"]').forEach(r => { r.checked = false; });
+  llenarTamanos();
+  actualizarArmado();
+}
+// Cascada: cada paso aparece cuando el anterior está elegido.
+function actualizarArmado() {
+  const a = armado();
+  $("paso-sabor").hidden = !a.tipo;
+  $("paso-tamano").hidden = !a.sabor;
+  $("paso-cobertura").hidden = !a.sabor || !a.tam;
+  $("paso-diseno").hidden = !a.sabor || !a.tam || !a.cobertura;
+  $("t-niveles").hidden = a.tipo !== "mini";
+  const p = presupuesto(a);
+  $("t-precio").textContent = p.texto;
+  $("t-nota").textContent = p.nota;
+  const elegidos = a.tipo ? [TIPO_TORTA[a.tipo], a.sabor, a.sabor && a.tam ? tamanoTexto(a.tipo, a.tam) : "", a.sabor && a.tam && a.cobertura ? "cobertura de " + a.cobertura.toLowerCase() : ""].filter(Boolean) : [];
+  $("t-resumen").textContent = elegidos.join(" · ");
+  $("t-resumen").hidden = !elegidos.length;
   $("t-recordatorio").hidden = !imagenes.length;
+  if (!$("t-aviso").hidden) {
+    const f = faltaEnTorta(a);
+    if (f) $("t-aviso").textContent = f[0]; else $("t-aviso").hidden = true;
+  }
+}
+function faltaEnTorta(a) {
+  const primero = nombre => document.querySelector(`input[name="${nombre}"]`);
+  if (!a.tipo) return ["Elige el tipo de torta.", primero("t-tipo")];
+  if (!a.sabor) return ["Elige el sabor.", $("t-sabor")];
+  if (!a.tam) return [a.tipo === "mini" ? "Elige el bizcocho." : "Elige el tamaño.", primero("t-tamano")];
+  if (!a.cobertura) return ["Elige la cobertura.", primero("t-cobertura")];
+  if (a.tipo === "mini" && !a.nivel) return ["Elige el diseño de la mini torta.", primero("t-nivel")];
+  if (subiendoImgs()) return ["Espera a que las imágenes terminen de subir.", null];
+  return null;
+}
+function reiniciarArmado() {
+  $("torta-form").reset();
+  for (const im of imagenes) URL.revokeObjectURL(im.previa);
+  imagenes.length = 0;
+  avisoImg("");
+  pintarImgs();
+  cambiarTipo();
+}
+function agregarTorta(e) {
+  e.preventDefault();
+  const a = armado(), falta = faltaEnTorta(a);
+  if (falta) {
+    $("t-ok").textContent = "";
+    $("t-aviso").textContent = falta[0];
+    $("t-aviso").hidden = false;
+    if (falta[1]) falta[1].focus();
+    return;
+  }
+  const mini = a.tipo === "mini";
+  tortas.push({
+    tipo: a.tipo,
+    sabor: a.sabor,
+    tamano: tamanoTexto(a.tipo, a.tam),
+    cobertura: a.cobertura,
+    nivel: mini ? String(DISENOS_MINI[Number(a.nivel)][0]) : "",
+    diseno: $("t-diseno").value.trim().replace(/\s+/g, " "),
+    precio: presupuesto(a).precio || 0,
+    masDiseno: !mini,
+    enlaces: imagenes.filter(im => im.estado === "lista").map(im => im.url),
+    fotos: imagenes.length,
+  });
+  reiniciarArmado();
+  pintarMisTortas();
+  actualizarBolsa();
+  $("t-ok").textContent = "✓ Torta agregada a tu pedido. Puedes armar otra o tocar “Enviar por WhatsApp” abajo.";
+}
+function pintarMisTortas() {
+  $("mis-tortas").hidden = !tortas.length;
+  $("t-lista").innerHTML = tortas.map((t, i) => {
+    const detalle = ["Cobertura de " + t.cobertura.toLowerCase(), t.nivel, t.fotos ? plural(t.fotos, "imagen", "imágenes") : ""].filter(Boolean).join(" · ");
+    return `<li><strong>🎂 ${esc(nombreTorta(t))}</strong><b>${esc(precioTorta(t))}</b><span>${esc(detalle)}</span><button class="linkbtn" type="button" data-quitar-torta="${i}">Quitar</button></li>`;
+  }).join("");
+}
+$("t-lista").addEventListener("click", e => {
+  const b = e.target.closest("[data-quitar-torta]");
+  if (!b) return;
+  if (!b.classList.contains("sure")) { b.classList.add("sure"); b.textContent = "¿Quitar? Toca otra vez"; return; }
+  tortas.splice(Number(b.dataset.quitarTorta), 1);
+  $("t-ok").textContent = "";
+  pintarMisTortas();
+  actualizarBolsa();
+});
+function iniciarArmado() {
+  $("t-coberturas").innerHTML = (MENU_TORTAS.coberturas || []).map(c => `<label class="pill"><input type="radio" name="t-cobertura" value="${esc(c)}"><span>${esc(c)}</span></label>`).join("");
+  $("t-niveles").innerHTML = DISENOS_MINI.map(([nombre, precio], i) => `<label class="opcion"><input type="radio" name="t-nivel" value="${i}"><span>${esc(nombre)} <small>${pesos(precio)}</small></span></label>`).join("");
+  document.querySelectorAll('input[name="t-tipo"]').forEach(r => r.addEventListener("change", cambiarTipo));
+  $("t-sabor").addEventListener("change", llenarTamanos);
+  ["input", "change"].forEach(ev => $("torta-form").addEventListener(ev, e => {
+    if (e.target.id !== "t-img") $("t-ok").textContent = "";
+    actualizarArmado();
+  }));
+  $("torta-form").addEventListener("submit", agregarTorta);
+  cambiarTipo();
 }
 
-// Imágenes de referencia: se achican, se pasan a JPEG y se suben a la carpeta de Google Drive del negocio.
+/* ---------- Imágenes de referencia: se achican, se pasan a JPEG y se suben a la carpeta de Google Drive del negocio ---------- */
 const MAX_IMG = 3;
 const imagenes = []; // { previa, estado: "subiendo" | "lista" | "error", url }
+const subiendoImgs = () => imagenes.some(im => im.estado === "subiendo");
 const avisoImg = texto => { $("t-img-msg").textContent = texto || ""; };
 function pintarImgs() {
   const estado = { subiendo: "Subiendo…", lista: "Lista", error: "No se subió" };
@@ -372,7 +504,7 @@ async function subirImagen(archivo, im) {
     if (imagenes.includes(im)) avisoImg((err && err.message) || "No se pudo subir la imagen.");
   }
   pintarImgs();
-  actualizarTorta();
+  actualizarArmado();
 }
 $("t-img").addEventListener("change", e => {
   const archivos = [...e.target.files];
@@ -387,7 +519,7 @@ $("t-img").addEventListener("change", e => {
   }
   avisoImg(rechazadas ? "Solo se pueden subir imágenes, sin documentos ni videos." : sobran ? `Puedes subir hasta ${MAX_IMG} imágenes.` : "");
   pintarImgs();
-  actualizarTorta();
+  actualizarArmado();
 });
 $("t-img-lista").addEventListener("click", e => {
   const b = e.target.closest("[data-quitar]");
@@ -396,20 +528,94 @@ $("t-img-lista").addEventListener("click", e => {
   if (im) URL.revokeObjectURL(im.previa);
   avisoImg("");
   pintarImgs();
-  actualizarTorta();
+  actualizarArmado();
 });
-["input", "change"].forEach(ev => $("torta-form").addEventListener(ev, actualizarTorta));
-$("torta-form").addEventListener("submit", e => e.preventDefault());
-// Sin tamaño o cobertura, o con imágenes subiendo, el botón muestra un aviso en vez de abrir WhatsApp.
-$("t-wa").addEventListener("click", e => {
-  const falta = !elegido("t-tamano") ? "t-tamano" : !elegido("t-cobertura") ? "t-cobertura" : "";
-  if (!falta && !subiendoImgs()) return;
+
+if (MENU_TORTAS && Array.isArray(MENU_TORTAS.porciones)) iniciarArmado();
+else $("torta-form").innerHTML = `<h3>Arma tu torta</h3><p class="loading">Pronto podrás armar tu torta aquí. Mientras, escríbenos por WhatsApp.</p>`;
+
+/* ---------- Pedido: cookies, frutitas y tortas en un solo mensaje ---------- */
+let entrega = ""; // "Delivery" o "Retiro"
+$("f-fecha").min = isoDia(new Date());
+
+function lineasTorta(t) {
+  const l = [`🎂 ${nombreTorta(t)} (${precioTorta(t)})`, `   · Cobertura: ${t.cobertura}`];
+  if (t.nivel || t.diseno) l.push(`   · ${t.nivel || "Diseño"}${t.diseno ? ": " + t.diseno : ""}`);
+  if (t.enlaces.length) l.push("   · Imágenes de referencia:", ...t.enlaces.map(u => "     " + u));
+  else if (t.fotos) l.push("   · Imágenes de referencia: te las envío aquí en el chat");
+  return l;
+}
+function textoPedido() {
+  const pares = Object.entries(carrito).filter(([id]) => porId[id]);
+  const bloques = [];
+  if (pares.length) bloques.push(pares.map(([id, q]) => {
+    const precio = precioDe(porId[id]);
+    return `• ${q} × ${porId[id].name}` + (precio ? ` (${pesos(q * precio)})` : "");
+  }).join("\n"));
+  if (tortas.length) bloques.push(tortas.map(t => lineasTorta(t).join("\n")).join("\n"));
+  // Al final: cuántas cookies, frutitas y tortas son, y la preorden, que no incluye el envío.
+  const r = resumenPedido(pares, porId, tortas);
+  const cuenta = [`Total: ${r.conteoTotal}`];
+  if (r.total) cuenta.push(`Preorden: ${pesos(r.total)}` + (r.masDiseno ? " + diseño" : "") + (entrega === "Delivery" ? " (sin envío)" : ""));
+  bloques.push(cuenta.join("\n"));
+  const nombre = $("f-name").value.trim(), sector = $("f-sector").value.trim(), fecha = fechaLarga($("f-fecha").value);
+  const datos = [];
+  if (nombre) datos.push(`Nombre: ${nombre}`);
+  if (entrega) datos.push(`Entrega: ${entrega}`);
+  if (entrega === "Delivery" && sector) datos.push(`Dirección: ${sector}`);
+  if (fecha) datos.push(`Fecha de entrega: ${fecha}`);
+  if (datos.length) bloques.push(datos.join("\n"));
+  if (tortas.some(t => t.fotos)) bloques.push("📎 Te envío también las fotos de referencia aquí en el chat.");
+  return "Hola Malibú! Quiero hacer este pedido:\n" + bloques.join("\n\n");
+}
+// Lo que falta para enviar: delivery o retiro siempre, y la fecha si el pedido lleva torta.
+function faltaEnBolsa() {
+  if (!entrega) return ["Elige delivery o retiro para enviar tu pedido.", $("f-delivery")];
+  if (tortas.length && !$("f-fecha").value) return ["Elige la fecha de entrega de tu torta.", $("f-fecha")];
+  return null;
+}
+function actualizarBolsa() {
+  for (const id in carrito) if (!porId[id]) delete carrito[id];
+  const r = resumenPedido(Object.entries(carrito), porId, tortas);
+  $("bag").hidden = !r.unidades && !r.tortas;
+  $("bag-count").textContent = r.conteo + (r.total ? " · " + pesos(r.total) + (r.masDiseno ? " + diseño" : "") : "");
+  const nombres = Object.keys(carrito).map(id => porId[id].name).concat(tortas.map(t => "🎂 " + t.sabor));
+  $("bag-list").textContent = (entrega ? entrega + " · " : "") + nombres.join(", ");
+  $("f-fotos").hidden = !tortas.some(t => t.fotos);
+  if (!$("f-aviso").hidden) {
+    const f = faltaEnBolsa();
+    if (f) $("f-aviso").textContent = f[0]; else $("f-aviso").hidden = true;
+  }
+  const t = textoPedido();
+  $("bag-text").textContent = t;
+  $("bag-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(t)}`;
+}
+function abrirDatos(abrir) {
+  const abierto = $("bag").classList.toggle("open", abrir);
+  $("bag-toggle").textContent = abierto ? "Cerrar" : "Datos";
+}
+$("bag-toggle").addEventListener("click", () => abrirDatos(!$("bag").classList.contains("open")));
+
+document.querySelectorAll('input[name="entrega"]').forEach(r => r.addEventListener("change", () => {
+  entrega = r.value;
+  const esDelivery = entrega === "Delivery";
+  $("f-sector-wrap").hidden = !esDelivery;
+  $("f-nota-retiro").hidden = esDelivery;
+  $("f-nota-envio").hidden = !esDelivery;
+  actualizarBolsa();
+}));
+
+// Si falta algo, el botón abre los datos y lo indica en vez de ir a WhatsApp.
+$("bag-wa").addEventListener("click", e => {
+  const falta = faltaEnBolsa();
+  if (!falta) return;
   e.preventDefault();
-  $("t-aviso").textContent = falta ? "Elige el tamaño y la cobertura para cotizar." : "Espera a que las imágenes terminen de subir.";
-  $("t-aviso").hidden = false;
-  if (falta) document.querySelector(`input[name="${falta}"]`).focus();
+  abrirDatos(true);
+  $("f-aviso").textContent = falta[0];
+  $("f-aviso").hidden = false;
+  falta[1].focus();
 });
-actualizarTorta();
+["f-name", "f-sector", "f-fecha"].forEach(id => ["input", "change"].forEach(ev => $(id).addEventListener(ev, actualizarBolsa)));
 
 async function cargar() {
   try {
