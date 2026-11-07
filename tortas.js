@@ -67,5 +67,7 @@ window.MALIBU_TORTAS = {
     ],
   },
 
-  coberturas: ["Crema", "Fondant"],
+  // Coberturas que se pueden elegir. Con una sola, la página no pregunta y todas las tortas van con esa.
+  // Para volver a ofrecer fondant, déjalo así: ["Crema", "Fondant"]
+  coberturas: ["Crema"],
 };

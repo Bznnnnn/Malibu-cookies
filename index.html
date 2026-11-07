@@ -85,7 +85,7 @@
           <ul class="puntos">
             <li>Tortas de bizcocho y de hojarasca, de 10 a 40 porciones.</li>
             <li>Mini tortas con el diseño incluido en el precio.</li>
-            <li>Cobertura de crema o fondant.</li>
+            <li id="t-cobertura-info">Todas con cobertura de crema.</li>
             <li>En las tortas de bizcocho y de hojarasca, el diseño se cotiza aparte según su dificultad.</li>
           </ul>
         </div>
@@ -112,7 +112,7 @@
             <div class="pills" id="t-coberturas"></div>
           </fieldset>
           <fieldset class="paso" id="paso-diseno" hidden>
-            <legend><b>5</b>Diseño</legend>
+            <legend><b id="t-paso-diseno">5</b>Diseño</legend>
             <div class="paso-cuerpo">
               <div class="opciones dos" id="t-niveles" hidden></div>
               <label for="t-diseno">Cuéntanos tu idea (opcional)<textarea id="t-diseno" rows="2" maxlength="400" placeholder="Colores, temática, nombre o edad"></textarea></label>
@@ -296,11 +296,15 @@ if (MENU_TORTAS) {
 }
 const minimo = lista => Math.min(...lista.map(Number).filter(n => n > 0));
 const DISENOS_MINI = MENU_TORTAS ? (MENU_TORTAS.mini || {}).disenos || [] : [];
+// Con una sola cobertura no se pregunta: todas las tortas van con esa y el diseño pasa a ser el paso 4.
+const COBERTURAS = MENU_TORTAS ? (MENU_TORTAS.coberturas || []).map(String) : [];
+const ELIGE_COBERTURA = COBERTURAS.length > 1;
 
 function armado() {
   const tipo = elegido("t-tipo"), sabor = $("t-sabor").value;
   const info = (SABORES[tipo] && SABORES[tipo].get(sabor)) || null;
-  return { tipo, sabor: info ? sabor : "", info, tam: elegido("t-tamano"), cobertura: elegido("t-cobertura"), nivel: elegido("t-nivel") };
+  const cobertura = ELIGE_COBERTURA ? elegido("t-cobertura") : "";
+  return { tipo, sabor: info ? sabor : "", info, tam: elegido("t-tamano"), cobertura, coberturaLista: !ELIGE_COBERTURA || !!cobertura, nivel: elegido("t-nivel") };
 }
 // Presupuesto de la torta que se está armando. Las mini tortas ya incluyen el diseño; las demás no.
 function presupuesto(a) {
@@ -308,7 +312,7 @@ function presupuesto(a) {
     const d = DISENOS_MINI[Number(a.nivel)];
     if (a.nivel !== "" && d) return { precio: Number(d[1]) || 0, texto: pesos(d[1]), nota: "Mini torta con el diseño incluido." };
     const desde = minimo(DISENOS_MINI.map(x => x[1]));
-    return { texto: isFinite(desde) ? "desde " + pesos(desde) : "—", nota: "El valor depende del diseño que elijas en el paso 5." };
+    return { texto: isFinite(desde) ? "desde " + pesos(desde) : "—", nota: "El valor depende del diseño que elijas en el último paso." };
   }
   if (!a.tipo) return { texto: "—", nota: "Elige el tipo de torta para empezar." };
   if (!a.sabor) {
@@ -372,8 +376,8 @@ function actualizarArmado() {
   const a = armado();
   $("paso-sabor").hidden = !a.tipo;
   $("paso-tamano").hidden = !a.sabor;
-  $("paso-cobertura").hidden = !a.sabor || !a.tam;
-  $("paso-diseno").hidden = !a.sabor || !a.tam || !a.cobertura;
+  $("paso-cobertura").hidden = !ELIGE_COBERTURA || !a.sabor || !a.tam;
+  $("paso-diseno").hidden = !a.sabor || !a.tam || !a.coberturaLista;
   $("t-niveles").hidden = a.tipo !== "mini";
   const p = presupuesto(a);
   $("t-precio").textContent = p.texto;
@@ -392,7 +396,7 @@ function faltaEnTorta(a) {
   if (!a.tipo) return ["Elige el tipo de torta.", primero("t-tipo")];
   if (!a.sabor) return ["Elige el sabor.", $("t-sabor")];
   if (!a.tam) return [a.tipo === "mini" ? "Elige el bizcocho." : "Elige el tamaño.", primero("t-tamano")];
-  if (!a.cobertura) return ["Elige la cobertura.", primero("t-cobertura")];
+  if (!a.coberturaLista) return ["Elige la cobertura.", primero("t-cobertura")];
   if (a.tipo === "mini" && !a.nivel) return ["Elige el diseño de la mini torta.", primero("t-nivel")];
   if (subiendoImgs()) return ["Espera a que las imágenes terminen de subir.", null];
   return null;
@@ -436,7 +440,7 @@ function agregarTorta(e) {
 function pintarMisTortas() {
   $("mis-tortas").hidden = !tortas.length;
   $("t-lista").innerHTML = tortas.map((t, i) => {
-    const detalle = ["Cobertura de " + t.cobertura.toLowerCase(), t.nivel, t.fotos ? plural(t.fotos, "imagen", "imágenes") : ""].filter(Boolean).join(" · ");
+    const detalle = [t.cobertura ? "Cobertura de " + t.cobertura.toLowerCase() : "", t.nivel, t.fotos ? plural(t.fotos, "imagen", "imágenes") : ""].filter(Boolean).join(" · ");
     return `<li><strong>🎂 ${esc(nombreTorta(t))}</strong><b>${esc(precioTorta(t))}</b><span>${esc(detalle)}</span><button class="linkbtn" type="button" data-quitar-torta="${i}">Quitar</button></li>`;
   }).join("");
 }
@@ -450,7 +454,11 @@ $("t-lista").addEventListener("click", e => {
   actualizarBolsa();
 });
 function iniciarArmado() {
-  $("t-coberturas").innerHTML = (MENU_TORTAS.coberturas || []).map(c => `<label class="pill"><input type="radio" name="t-cobertura" value="${esc(c)}"><span>${esc(c)}</span></label>`).join("");
+  $("t-coberturas").innerHTML = COBERTURAS.map(c => `<label class="pill"><input type="radio" name="t-cobertura" value="${esc(c)}"><span>${esc(c)}</span></label>`).join("");
+  $("t-paso-diseno").textContent = ELIGE_COBERTURA ? "5" : "4";
+  const enMinuscula = COBERTURAS.map(c => c.toLowerCase());
+  $("t-cobertura-info").hidden = !COBERTURAS.length;
+  $("t-cobertura-info").textContent = ELIGE_COBERTURA ? `Cobertura de ${enMinuscula.slice(0, -1).join(", ")} o ${enMinuscula[enMinuscula.length - 1]}.` : `Todas con cobertura de ${enMinuscula[0]}.`;
   $("t-niveles").innerHTML = DISENOS_MINI.map(([nombre, precio], i) => `<label class="opcion"><input type="radio" name="t-nivel" value="${i}"><span>${esc(nombre)} <small>${pesos(precio)}</small></span></label>`).join("");
   document.querySelectorAll('input[name="t-tipo"]').forEach(r => r.addEventListener("change", cambiarTipo));
   $("t-sabor").addEventListener("change", llenarTamanos);
@@ -539,7 +547,8 @@ let entrega = ""; // "Delivery" o "Retiro"
 $("f-fecha").min = isoDia(new Date());
 
 function lineasTorta(t) {
-  const l = [`🎂 ${nombreTorta(t)} (${precioTorta(t)})`, `   · Cobertura: ${t.cobertura}`];
+  const l = [`🎂 ${nombreTorta(t)} (${precioTorta(t)})`];
+  if (t.cobertura) l.push(`   · Cobertura: ${t.cobertura}`);
   if (t.nivel || t.diseno) l.push(`   · ${t.nivel || "Diseño"}${t.diseno ? ": " + t.diseno : ""}`);
   if (t.enlaces.length) l.push("   · Imágenes de referencia:", ...t.enlaces.map(u => "     " + u));
   else if (t.fotos) l.push("   · Imágenes de referencia: te las envío aquí en el chat");
