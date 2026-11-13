@@ -91,7 +91,10 @@ section{padding-block:72px}
 .badge.out{background:var(--ink);color:var(--white)}
 .item.soldout .plate img{filter:grayscale(.8);opacity:.55}
 .item h3{font-size:1.02rem;font-stretch:105%;font-weight:800;text-transform:uppercase;letter-spacing:.02em;margin-top:4px}
+@media (max-width:460px){.item .contiene{font-size:.78rem}}
 .item .precio{margin:-2px 0 2px;font-weight:800;font-size:1rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.item .contiene{margin:0;max-width:28ch;font-size:.82rem;line-height:1.35;color:var(--ink-soft)}
+.item .pie{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
 .qty{display:flex;align-items:center;gap:6px;min-height:36px}
 .qty button{width:36px;height:36px;border-radius:50%;border:2px solid var(--ink);background:transparent;color:var(--ink);font:700 1.2rem/1 var(--body);cursor:pointer}
 .qty button.add{background:var(--ink);color:var(--white)}
@@ -158,12 +161,16 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 .bag .nota.fotos{opacity:1;font-weight:600;padding:8px 12px;border-radius:10px;border:2px dashed rgba(255,255,255,.6)}
 .bag .ancho{grid-column:1/-1}
 .bag input[type="date"]{display:block;width:100%;min-height:40px}
+.bag .ayuda{font-size:.75rem;font-weight:500}
+.bag .ayuda.error{padding:5px 9px;border-radius:8px;background:var(--accent);color:var(--white);font-weight:700}
 .bag.open .inner{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px - env(safe-area-inset-bottom,0px));overflow-y:auto;overscroll-behavior:contain}
 @media (max-width:520px){.bag .inner{padding:14px 14px 14px 16px;gap:10px}.bag .sum{flex-basis:100%}#bag-wa{flex:1}.bag .fields{grid-template-columns:1fr}.bag .modo > span{flex-basis:100%}.bag .opt{flex:1}.bag .opt span{flex:1;text-align:center}}
 
 /* admin */
 .admin{background:var(--paper-2);border-top:3px solid var(--ink)}
 .admin .cols{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+.admin .cols > *{min-width:0}
+@media (max-width:520px){.admin .sec-head h2{font-size:clamp(1.8rem,8.5vw,2.6rem);overflow-wrap:anywhere}.admin .btn{white-space:normal;text-align:center;line-height:1.2}}
 @media (max-width:900px){.admin .cols{grid-template-columns:1fr}}
 .admin h3{font-size:1.4rem;font-stretch:100%;margin-bottom:6px}
 .admin .hint{color:var(--ink-soft);font-size:.92rem;margin:0 0 14px}
@@ -200,7 +207,20 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 .prod-row input{width:76px;font:600 .95rem var(--body);padding:6px 8px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:var(--white)}
 .prod-row .del{border:0;background:none;color:var(--warn);font:600 .85rem var(--body);cursor:pointer;white-space:nowrap}
 .prod-row .del.sure{background:var(--warn);color:var(--white);border-radius:999px;padding:6px 10px}
-@media (max-width:520px){.prod-row{grid-template-columns:40px minmax(0,1fr) auto}.prod-row img{width:40px;height:40px}.prod-row .del{grid-column:2/-1;justify-self:start;padding-left:0}}
+.prod-row .nm small{display:block;font-size:.8rem;font-weight:500;color:var(--ink-soft)}
+.prod-row .nm .pr.propio{color:var(--accent);font-weight:700}
+.prod-row .nm .ok{color:var(--ok);font-weight:700}
+.prod-row .nm .ct{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prod-row .acc{display:flex;align-items:center;gap:12px}
+.prod-row .edit{border:0;background:none;padding:0;color:var(--ink);font:600 .85rem var(--body);text-decoration:underline;cursor:pointer;white-space:nowrap}
+.prod-row.abierta{border-color:var(--ink)}
+.prod-row .editor{grid-column:1/-1;display:grid;gap:10px;margin-top:4px;padding-top:12px;border-top:1px dashed var(--line)}
+.prod-row .editor label{display:grid;gap:5px;font-size:.85rem;font-weight:600}
+.admin .prod-row .editor textarea{min-height:64px}
+.prod-row .editor input{width:100%;max-width:180px}
+.prod-row .editor .hint{margin:-4px 0 0;font-size:.82rem}
+.prod-row .editor .msg{margin:0;min-height:0}
+@media (max-width:520px){.prod-row{grid-template-columns:40px minmax(0,1fr) auto}.prod-row img{width:40px;height:40px}.prod-row .acc{grid-column:2/-1;justify-self:start}}
 .form{display:grid;gap:12px}
 .form label{display:grid;gap:5px;font-size:.88rem;font-weight:600}
 .form input,.form select{font:500 .98rem var(--body);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--white);color:var(--ink);min-width:0}

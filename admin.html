@@ -62,11 +62,15 @@
             <p class="hint">Aparece en la tienda apenas lo guardas.</p>
             <form class="form" id="add-form">
               <label for="np-name">Nombre<input id="np-name" required maxlength="60" placeholder="Ej: Frutilla"></label>
+              <label for="np-contiene">Qué contiene (opcional)<textarea id="np-contiene" rows="2" maxlength="150" placeholder="Ej: masa de vainilla, relleno de manjar y chips de chocolate"></textarea></label>
               <div class="two">
                 <label for="np-cat">Sección<select id="np-cat"><option value="c">Cookies clásicas</option><option value="p">Cookies premium</option><option value="f">Frutitas virales</option></select></label>
-                <label for="np-qty">Stock inicial<input id="np-qty" type="number" min="0" step="1" inputmode="numeric" placeholder="Sin control"></label>
+                <label for="np-precio">Precio (opcional)<input id="np-precio" inputmode="numeric" maxlength="9" placeholder="Vacío: el de la sección"></label>
               </div>
-              <label for="np-img">Foto (opcional)<input id="np-img" type="file" accept="image/*"></label>
+              <div class="two">
+                <label for="np-qty">Stock inicial<input id="np-qty" type="number" min="0" step="1" inputmode="numeric" placeholder="Sin control"></label>
+                <label for="np-img">Foto (opcional)<input id="np-img" type="file" accept="image/*"></label>
+              </div>
               <button class="btn btn-ink" type="submit" id="np-save">Agregar</button>
               <p class="msg" id="add-msg" role="status"></p>
             </form>
@@ -78,8 +82,8 @@
           </div>
         </div>
         <div class="card">
-          <h3>Productos y stock</h3>
-          <p class="hint">Escribe las unidades disponibles y sal del recuadro para guardar. Vacío significa sin control de stock.</p>
+          <h3>Productos, precios y stock</h3>
+          <p class="hint">Escribe las unidades disponibles y sal del recuadro para guardar. Vacío significa sin control de stock. Con “Editar” cambias qué contiene cada sabor y su precio.</p>
           <div class="prod-list" id="prod-list"><p class="loading">Cargando…</p></div>
           <p class="msg" id="stock-msg" role="status"></p>
         </div>
@@ -145,10 +149,48 @@ function usarProductos(lista) {
   porNombre = Object.fromEntries(productos.map(p => [norm(p.name), p.id]));
   pintarProductos(); leerPedidoPegado();
 }
+// Editor de "qué contiene" y precio propio: uno abierto a la vez. Lo escrito se guarda en un
+// borrador para no perderlo si la lista se vuelve a pintar mientras se edita.
+let editando = null, guardadoReciente = null;
+const borrador = {};
+const limpiarPrecio = v => String(v || "").replace(/[$.\s]/g, "");
+function editorDe(p) {
+  const b = borrador[p.id] || (borrador[p.id] = { contiene: p.contiene || "", precio: p.precio ? String(p.precio) : "" });
+  return `<div class="editor"><label for="ed-contiene">Qué contiene<textarea id="ed-contiene" data-campo="contiene" rows="2" maxlength="150" placeholder="Ej: masa de chocolate, relleno de menta y chips">${esc(b.contiene)}</textarea></label><label for="ed-precio">Precio<input id="ed-precio" data-campo="precio" inputmode="numeric" maxlength="9" value="${esc(b.precio)}" placeholder="${precioSeccion(p.cat)}"></label><p class="hint">Vacío: usa el precio de ${esc(MALIBU_SECCIONES[p.cat].toLowerCase())} (${pesos(precioSeccion(p.cat))}).</p><div class="adm-bar"><button class="btn btn-ink" type="button" data-guardar="${esc(p.id)}">Guardar</button><button class="btn btn-ghost" type="button" data-cancelar>Cancelar</button></div><p class="msg" id="ed-msg" role="status"></p></div>`;
+}
+function filaProducto(p) {
+  const propio = Number(p.precio) > 0;
+  const precio = `<small class="pr${propio ? " propio" : ""}">${pesos(precioDe(p))}${propio ? " · precio propio" : ""}${guardadoReciente === p.id ? ` <b class="ok">Guardado ✓</b>` : ""}</small>`;
+  const contiene = p.contiene ? `<small class="ct">${esc(p.contiene)}</small>` : "";
+  return `<div class="prod-row${editando === p.id ? " abierta" : ""}"><img src="${fotoDe(p)}" alt=""><div class="nm">${esc(p.name)}${precio}${contiene}</div><input type="number" min="0" step="1" inputmode="numeric" id="st-${esc(p.id)}" data-s="${esc(p.id)}" value="${typeof p.stock === "number" ? p.stock : ""}" placeholder="—" aria-label="Stock de ${esc(p.name)}"><div class="acc"><button class="edit" type="button" data-editar="${esc(p.id)}" aria-expanded="${editando === p.id}">Editar</button><button class="del" type="button" data-del="${esc(p.id)}">Eliminar</button></div>${editando === p.id ? editorDe(p) : ""}</div>`;
+}
 function pintarProductos() {
-  const enfocado = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.s : null;
-  $("prod-list").innerHTML = ["c", "p", "f"].map(c => `<div class="prod-group"><h4>${MALIBU_SECCIONES[c]} (${porSeccion(productos, c).length})</h4>${porSeccion(productos, c).map(p => `<div class="prod-row"><img src="${fotoDe(p)}" alt=""><span class="nm">${esc(p.name)}</span><input type="number" min="0" step="1" inputmode="numeric" id="st-${esc(p.id)}" data-s="${esc(p.id)}" value="${typeof p.stock === "number" ? p.stock : ""}" placeholder="—" aria-label="Stock de ${esc(p.name)}"><button class="del" type="button" data-del="${esc(p.id)}">Eliminar</button></div>`).join("")}</div>`).join("");
+  const activo = document.activeElement && document.activeElement.dataset ? document.activeElement : null;
+  const enfocado = activo ? activo.dataset.s : null, campo = activo ? activo.dataset.campo : null;
+  if (editando && !porId[editando]) editando = null;
+  $("prod-list").innerHTML = ["c", "p", "f"].map(c => `<div class="prod-group"><h4>${MALIBU_SECCIONES[c]} (${porSeccion(productos, c).length})</h4>${porSeccion(productos, c).map(filaProducto).join("")}</div>`).join("");
   if (enfocado && $("st-" + enfocado)) $("st-" + enfocado).focus();
+  if (campo && $("ed-" + campo)) $("ed-" + campo).focus();
+}
+$("prod-list").addEventListener("input", e => {
+  const c = e.target.closest("[data-campo]");
+  if (c && editando && borrador[editando]) borrador[editando][c.dataset.campo] = c.value;
+});
+async function guardarDetalle(id, btn) {
+  const b = borrador[id] || {};
+  const precio = limpiarPrecio(b.precio);
+  if (precio && !/^\d{1,7}$/.test(precio)) { aviso("ed-msg", "Escribe el precio solo con números, por ejemplo 1800.", false); return; }
+  btn.disabled = true;
+  aviso("ed-msg", "Guardando…", true);
+  const r = await api({ action: "guardarDetalle", id, contiene: String(b.contiene || "").trim(), precio });
+  if (r.ok) {
+    delete borrador[id];
+    editando = null; guardadoReciente = id;
+    pintarProductos();
+    return;
+  }
+  btn.disabled = false;
+  if ($("ed-msg")) aviso("ed-msg", r.error === "accion" ? "Para guardar esto, primero actualiza el script de tu hoja de Google (Implementar > Administrar implementaciones > Nueva versión)." : (r.mensaje || "No se pudo guardar."), false);
 }
 $("prod-list").addEventListener("change", async e => {
   const inp = e.target.closest("input[data-s]");
@@ -159,6 +201,22 @@ $("prod-list").addEventListener("change", async e => {
   aviso("stock-msg", r.ok ? "Stock guardado: " + nombre : (r.mensaje || "No se pudo guardar."), r.ok);
 });
 $("prod-list").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-editar]");
+  if (ed) {
+    guardadoReciente = null;
+    editando = editando === ed.dataset.editar ? null : ed.dataset.editar;
+    pintarProductos();
+    if (editando) $("ed-contiene").focus();
+    return;
+  }
+  if (e.target.closest("[data-cancelar]")) {
+    delete borrador[editando];
+    editando = null;
+    pintarProductos();
+    return;
+  }
+  const g = e.target.closest("[data-guardar]");
+  if (g) { guardarDetalle(g.dataset.guardar, g); return; }
   const b = e.target.closest("button[data-del]");
   if (!b) return;
   if (!b.classList.contains("sure")) {
@@ -186,6 +244,8 @@ $("add-form").addEventListener("submit", async e => {
   const nombre = $("np-name").value.trim();
   if (!nombre) { aviso("add-msg", "Escribe un nombre.", false); return; }
   if (porNombre[norm(nombre)]) { aviso("add-msg", "Ya existe un producto con ese nombre.", false); return; }
+  const precio = limpiarPrecio($("np-precio").value);
+  if (precio && !/^\d{1,7}$/.test(precio)) { aviso("add-msg", "Escribe el precio solo con números, por ejemplo 1800.", false); return; }
   const btn = $("np-save"); btn.disabled = true;
   aviso("add-msg", "Guardando…", true);
   let fotoBase64 = "";
@@ -195,9 +255,12 @@ $("add-form").addEventListener("submit", async e => {
     catch (err) { aviso("add-msg", "No pude leer esa foto. Prueba con una JPG o PNG.", false); btn.disabled = false; return; }
   }
   const cat = $("np-cat").value;
-  const r = await api({ action: "agregarProducto", nombre, cat, stock: $("np-qty").value.trim(), fotoBase64 });
+  const r = await api({ action: "agregarProducto", nombre, cat, stock: $("np-qty").value.trim(), fotoBase64, contiene: $("np-contiene").value.trim(), precio });
   btn.disabled = false;
-  if (r.ok) { $("add-form").reset(); aviso("add-msg", `Agregado: ${nombre} en ${MALIBU_SECCIONES[cat]}.`, true); }
+  // Con el script antiguo de la hoja, el producto se agrega sin "qué contiene" ni precio propio.
+  const nuevo = r.ok && (r.productos || []).find(p => norm(p.name) === norm(nombre));
+  const sinDetalle = nuevo && !("contiene" in nuevo) && ($("np-contiene").value.trim() || precio);
+  if (r.ok) { $("add-form").reset(); aviso("add-msg", sinDetalle ? `Agregado: ${nombre}. Para guardar qué contiene y su precio, primero actualiza el script de tu hoja de Google.` : `Agregado: ${nombre} en ${MALIBU_SECCIONES[cat]}.`, !sinDetalle); }
   else aviso("add-msg", r.mensaje || "No se pudo agregar.", false);
 });
 

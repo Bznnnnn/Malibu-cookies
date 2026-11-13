@@ -6,7 +6,9 @@ const MALIBU_SECCIONES = { c: "Cookies clásicas", p: "Cookies premium", f: "Fru
 
 // Precios por sección. Los que valen se cambian en config.js; estos quedan de respaldo.
 const MALIBU_PRECIOS_BASE = { c: 1500, p: 2000, f: 4000 };
-function precioDe(p) { const t = window.MALIBU_PRECIOS || {}; return Number(t[p?.cat] ?? MALIBU_PRECIOS_BASE[p?.cat]) || 0; }
+function precioSeccion(cat) { const t = window.MALIBU_PRECIOS || {}; return Number(t[cat] ?? MALIBU_PRECIOS_BASE[cat]) || 0; }
+// Un sabor puede tener su propio precio (se pone en el admin); si no, vale el de su sección.
+function precioDe(p) { return Number(p?.precio) > 0 ? Number(p.precio) : precioSeccion(p?.cat); }
 const pesos = n => "$" + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;

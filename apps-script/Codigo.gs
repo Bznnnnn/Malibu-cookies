@@ -19,6 +19,9 @@
  * Para actualizar este código más adelante: pégalo, guarda y ve a Implementar >
  * Administrar implementaciones > lápiz > Versión: Nueva versión > Implementar.
  * Así la URL /exec sigue siendo la misma.
+ *
+ * En la pestaña "Productos", la columna "contiene" dice qué lleva cada sabor y la columna
+ * "precio" es un precio propio del sabor. Si "precio" está vacía, vale el precio de su sección.
  */
 
 // ID de la hoja de cálculo (lo que va entre /d/ y /edit en su enlace).
@@ -40,7 +43,8 @@ const SESION_SEG = 6 * 60 * 60;  // 6 horas
 
 const SECCION_A_CODIGO = { clasica: 'c', clasicas: 'c', premium: 'p', frutitas: 'f', frutita: 'f' };
 const CODIGO_A_SECCION = { c: 'Clásica', p: 'Premium', f: 'Frutitas' };
-const COLS_PRODUCTOS = ['id', 'nombre', 'seccion', 'foto', 'orden', 'stock'];
+const COLS_PRODUCTOS = ['id', 'nombre', 'seccion', 'foto', 'orden', 'stock', 'contiene', 'precio'];
+const MAX_CONTIENE = 150;        // caracteres de "qué contiene" 
 const COLS_PEDIDOS = ['id', 'fecha', 'cliente', 'detalle', 'items_json', 'estado'];
 
 const CATALOGO_INICIAL = [
@@ -70,13 +74,14 @@ function configurar() {
   if (!prod) prod = ss.insertSheet(HOJA_PRODUCTOS);
   if (prod.getLastRow() === 0) {
     prod.appendRow(COLS_PRODUCTOS);
-    const filas = CATALOGO_INICIAL.map((p, i) => [p[0], p[1], CODIGO_A_SECCION[p[2]], 'img/' + p[0] + '.jpg', i + 1, '']);
+    const filas = CATALOGO_INICIAL.map((p, i) => [p[0], p[1], CODIGO_A_SECCION[p[2]], 'img/' + p[0] + '.jpg', i + 1, '', '', '']);
     prod.getRange(2, 1, filas.length, COLS_PRODUCTOS.length).setValues(filas);
     prod.setFrozenRows(1);
     prod.getRange(1, 1, 1, COLS_PRODUCTOS.length).setFontWeight('bold');
     const regla = SpreadsheetApp.newDataValidation().requireValueInList(['Clásica', 'Premium', 'Frutitas'], true).build();
     prod.getRange(2, 3, 500, 1).setDataValidation(regla);
   }
+  asegurarColumnas_(prod);
 
   let ped = ss.getSheetByName(HOJA_PEDIDOS);
   if (!ped) ped = ss.insertSheet(HOJA_PEDIDOS);
@@ -133,6 +138,7 @@ function doPost(e) {
       case 'agregarProducto': return json_(conLock_(() => agregarProducto_(body)));
       case 'eliminarProducto': return json_(conLock_(() => eliminarProducto_(body.id)));
       case 'guardarStock': return json_(conLock_(() => guardarStock_(body.id, body.stock)));
+      case 'guardarDetalle': return json_(conLock_(() => guardarDetalle_(body.id, body.contiene, body.precio)));
       case 'confirmarPedido': return json_(conLock_(() => confirmarPedido_(body.items, body.cliente)));
       case 'anularPedido': return json_(conLock_(() => anularPedido_(body.id)));
       case 'pedidos': return json_({ ok: true, pedidos: leerPedidos_() });
@@ -207,6 +213,8 @@ function leerProductos_() {
       img: String(r[3] || '').trim(),
       orden: Number(r[4]) || 0,
       stock: r[5] === '' || r[5] === null ? null : Math.max(0, Math.floor(Number(r[5]) || 0)),
+      contiene: String(r[6] === undefined || r[6] === null ? '' : r[6]).trim(),
+      precio: Number(r[7]) > 0 ? Math.round(Number(r[7])) : null,
     }))
     .sort((a, b) => a.orden - b.orden);
 }
@@ -223,13 +231,55 @@ function agregarProducto_(b) {
   let id = base, n = 2;
   while (productos.some(p => p.id === id)) id = base + '-' + (n++);
 
+  const precio = precioValido_(b.precio);
+  if (precio === null) return { ok: false, mensaje: 'Escribe el precio solo con números, por ejemplo 1800.' };
   let foto = '';
   if (b.fotoBase64) foto = guardarFoto_(b.fotoBase64, id);
 
   const orden = productos.reduce((m, p) => Math.max(m, p.orden), 0) + 1;
   const stock = b.stock === '' || b.stock === null || b.stock === undefined ? '' : Math.max(0, Math.floor(Number(b.stock) || 0));
-  hoja_(HOJA_PRODUCTOS).appendRow([id, nombre, CODIGO_A_SECCION[cat], foto, orden, stock]);
+  const h = hoja_(HOJA_PRODUCTOS);
+  asegurarColumnas_(h);
+  h.appendRow([id, comoTexto_(nombre), CODIGO_A_SECCION[cat], foto, orden, stock, comoTexto_(textoContiene_(b.contiene)), precio]);
   return { ok: true, productos: leerProductos_() };
+}
+
+// Qué contiene el sabor y su precio propio (vacío = precio de la sección).
+function guardarDetalle_(id, contiene, precio) {
+  const h = hoja_(HOJA_PRODUCTOS);
+  const fila = buscarFila_(h, id);
+  if (!fila) return { ok: false, mensaje: 'Ese producto ya no existe.' };
+  const valor = precioValido_(precio);
+  if (valor === null) return { ok: false, mensaje: 'Escribe el precio solo con números, por ejemplo 1800.' };
+  asegurarColumnas_(h);
+  h.getRange(fila, 7, 1, 2).setValues([[comoTexto_(textoContiene_(contiene)), valor]]);
+  return { ok: true, productos: leerProductos_() };
+}
+
+function textoContiene_(t) {
+  return String(t === undefined || t === null ? '' : t).replace(/\s+/g, ' ').trim().slice(0, MAX_CONTIENE);
+}
+
+// Acepta "1800", "1.800" o "$1.800". Devuelve '' si está vacío y null si no es un precio válido.
+function precioValido_(v) {
+  const s = String(v === undefined || v === null ? '' : v).replace(/[$.\s]/g, '');
+  if (!s) return '';
+  if (!/^\d{1,7}$/.test(s)) return null;
+  return Number(s) > 0 ? Number(s) : '';
+}
+
+// Un texto que empieza con = + - @ se guarda como texto y no como fórmula.
+function comoTexto_(t) {
+  return /^[=+\-@]/.test(t) ? "'" + t : t;
+}
+
+// Las hojas creadas antes no tienen las columnas "contiene" y "precio": se agregan al guardar.
+function asegurarColumnas_(h) {
+  const titulos = h.getRange(1, 1, 1, COLS_PRODUCTOS.length).getValues()[0];
+  if (titulos.every((t, i) => String(t).trim() === COLS_PRODUCTOS[i])) return;
+  const faltan = COLS_PRODUCTOS.map((c, i) => [c, i]).filter(([c, i]) => !String(titulos[i]).trim());
+  faltan.forEach(([c, i]) => h.getRange(1, i + 1).setValue(c));
+  h.getRange(1, 1, 1, COLS_PRODUCTOS.length).setFontWeight('bold');
 }
 
 function eliminarProducto_(id) {

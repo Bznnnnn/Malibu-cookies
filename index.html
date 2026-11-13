@@ -151,13 +151,13 @@
       <div class="sec-head"><div><div class="eyebrow">Fácil y rápido</div><h2>Cómo pedir</h2></div></div>
       <div class="steps">
         <div class="card step"><b>1</b><h3>Arma tu pedido</h3><p>Elige cookies y frutitas con el botón + y arma tu torta en la pestaña Tortas. Todo va en un solo pedido.</p></div>
-        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y la fecha de entrega, y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
+        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y la fecha de entrega (desde el día siguiente), y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
         <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total final, con el envío y el diseño de la torta si corresponde, y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
       </div>
       <div class="info">
         <div class="card" id="entregas">
           <h3>Entregas en Talca</h3>
-          <p>Hacemos delivery dentro de Talca. El costo del despacho varía según el sector donde vivas; te lo confirmamos junto con el total de tu pedido. Si prefieres retirar, elige Retiro al hacer tu pedido y lo coordinamos por WhatsApp.</p>
+          <p>Hacemos delivery dentro de Talca. Los pedidos se agendan desde el día siguiente: no hacemos entregas el mismo día. El costo del despacho varía según el sector donde vivas; te lo confirmamos junto con el total de tu pedido. Si prefieres retirar, elige Retiro al hacer tu pedido y lo coordinamos por WhatsApp.</p>
         </div>
         <div class="card">
           <h3>WhatsApp</h3>
@@ -197,7 +197,7 @@
       </div>
       <p class="aviso" id="f-aviso" role="alert" hidden>Elige delivery o retiro para enviar tu pedido.</p>
       <label for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
-      <label for="f-fecha">Fecha de entrega<input type="date" id="f-fecha"></label>
+      <label for="f-fecha">Fecha de entrega<input type="date" id="f-fecha"><small class="ayuda" id="f-fecha-ayuda">Desde mañana: no hacemos entregas el mismo día.</small></label>
       <label class="ancho" id="f-sector-wrap" for="f-sector" hidden>Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
       <p class="nota" id="f-nota-retiro" hidden>Coordinamos el retiro contigo por WhatsApp.</p>
       <p class="nota" id="f-nota-envio" hidden>La preorden no incluye el envío: depende de tu sector y te lo confirmamos por WhatsApp.</p>
@@ -228,7 +228,7 @@ function etiqueta(p) {
 }
 function tarjeta(p, num) {
   const q = carrito[p.id] || 0, n = quedan(p);
-  return `<div class="item${q ? " on" : ""}${n <= 0 ? " soldout" : ""}"><div class="plate">${num ? `<span class="num">${num}</span>` : ""}<img src="${fotoDe(p)}" alt="${esc(p.name)}" loading="lazy">${etiqueta(p)}</div><h3>${esc(p.name)}</h3>${precioDe(p) ? `<p class="precio">${pesos(precioDe(p))}</p>` : ""}<div class="qty"><button class="minus" type="button" data-s="${esc(p.id)}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><output>${q}</output><button class="add" type="button" data-s="${esc(p.id)}" data-d="1" aria-label="Agregar ${esc(p.name)}"${q >= n ? " disabled" : ""}>+</button></div></div>`;
+  return `<div class="item${q ? " on" : ""}${n <= 0 ? " soldout" : ""}"><div class="plate">${num ? `<span class="num">${num}</span>` : ""}<img src="${fotoDe(p)}" alt="${esc(p.name)}" loading="lazy">${etiqueta(p)}</div><h3>${esc(p.name)}</h3>${p.contiene ? `<p class="contiene">${esc(p.contiene)}</p>` : ""}<div class="pie">${precioDe(p) ? `<p class="precio">${pesos(precioDe(p))}</p>` : ""}<div class="qty"><button class="minus" type="button" data-s="${esc(p.id)}" data-d="-1" aria-label="Quitar ${esc(p.name)}">−</button><output>${q}</output><button class="add" type="button" data-s="${esc(p.id)}" data-d="1" aria-label="Agregar ${esc(p.name)}"${q >= n ? " disabled" : ""}>+</button></div></div></div>`;
 }
 function pintar() {
   for (const c of ["c", "p", "f"]) $("n-" + c).textContent = porSeccion(productos, c).length;
@@ -544,7 +544,10 @@ else $("torta-form").innerHTML = `<h3>Arma tu torta</h3><p class="loading">Pront
 
 /* ---------- Pedido: cookies, frutitas y tortas en un solo mensaje ---------- */
 let entrega = ""; // "Delivery" o "Retiro"
-$("f-fecha").min = isoDia(new Date());
+// No hay entregas el mismo día: la fecha más cercana es mañana.
+const fechaMinima = () => { const d = new Date(); d.setDate(d.getDate() + 1); return isoDia(d); };
+const fechaInvalida = () => !!$("f-fecha").value && $("f-fecha").value < fechaMinima();
+$("f-fecha").min = fechaMinima();
 
 function lineasTorta(t) {
   const l = [`🎂 ${nombreTorta(t)} (${precioTorta(t)})`];
@@ -577,9 +580,10 @@ function textoPedido() {
   if (tortas.some(t => t.fotos)) bloques.push("📎 Te envío también las fotos de referencia aquí en el chat.");
   return "Hola Malibú! Quiero hacer este pedido:\n" + bloques.join("\n\n");
 }
-// Lo que falta para enviar: delivery o retiro siempre, y la fecha si el pedido lleva torta.
+// Lo que falta para enviar: delivery o retiro siempre, una fecha desde mañana, y la fecha si el pedido lleva torta.
 function faltaEnBolsa() {
   if (!entrega) return ["Elige delivery o retiro para enviar tu pedido.", $("f-delivery")];
+  if (fechaInvalida()) return ["No hacemos entregas el mismo día. Elige una fecha desde mañana.", $("f-fecha")];
   if (tortas.length && !$("f-fecha").value) return ["Elige la fecha de entrega de tu torta.", $("f-fecha")];
   return null;
 }
@@ -591,6 +595,7 @@ function actualizarBolsa() {
   const nombres = Object.keys(carrito).map(id => porId[id].name).concat(tortas.map(t => "🎂 " + t.sabor));
   $("bag-list").textContent = (entrega ? entrega + " · " : "") + nombres.join(", ");
   $("f-fotos").hidden = !tortas.some(t => t.fotos);
+  $("f-fecha-ayuda").classList.toggle("error", fechaInvalida());
   if (!$("f-aviso").hidden) {
     const f = faltaEnBolsa();
     if (f) $("f-aviso").textContent = f[0]; else $("f-aviso").hidden = true;
@@ -600,6 +605,7 @@ function actualizarBolsa() {
   $("bag-wa").href = `https://wa.me/${window.MALIBU_WHATSAPP}?text=${encodeURIComponent(t)}`;
 }
 function abrirDatos(abrir) {
+  $("f-fecha").min = fechaMinima();
   const abierto = $("bag").classList.toggle("open", abrir);
   $("bag-toggle").textContent = abierto ? "Cerrar" : "Datos";
 }
