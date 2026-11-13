@@ -214,6 +214,10 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 .prod-row .acc{display:flex;align-items:center;gap:12px}
 .prod-row .edit{border:0;background:none;padding:0;color:var(--ink);font:600 .85rem var(--body);text-decoration:underline;cursor:pointer;white-space:nowrap}
 .prod-row.abierta{border-color:var(--ink)}
+.aviso-script{margin:0 0 18px;padding:14px 16px;border-radius:14px;border:2px dashed var(--accent);background:var(--white);font-size:.92rem}
+.aviso-script p{margin:4px 0 8px;color:var(--ink-soft)}
+.aviso-script ol{margin:0;padding-left:20px;display:grid;gap:4px}
+.aviso-script a{color:var(--accent);font-weight:700}
 .prod-row .editor{grid-column:1/-1;display:grid;gap:10px;margin-top:4px;padding-top:12px;border-top:1px dashed var(--line)}
 .prod-row .editor label{display:grid;gap:5px;font-size:.85rem;font-weight:600}
 .admin .prod-row .editor textarea{min-height:64px}

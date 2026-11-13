@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="estilos.css?v=20261113">
 </head>
 <body>
 <header class="top">
@@ -82,6 +82,16 @@
           </div>
         </div>
         <div class="card">
+          <div class="aviso-script" id="aviso-script" role="status" hidden>
+            <strong>Falta actualizar el script de tu hoja de Google.</strong>
+            <p>Hasta entonces, “Editar” no puede guardar qué contiene cada sabor ni su precio. El stock y los pedidos funcionan igual.</p>
+            <ol>
+              <li>Copia el código nuevo desde <a href="https://raw.githubusercontent.com/Bznnnnn/Malibu-cookies/main/apps-script/Codigo.gs" target="_blank" rel="noopener">este enlace</a> (todo el texto).</li>
+              <li>En tu hoja: Extensiones &gt; Apps Script. Reemplaza todo el código por el nuevo y guarda.</li>
+              <li>Implementar &gt; Administrar implementaciones &gt; lápiz &gt; Versión: Nueva versión &gt; Implementar.</li>
+              <li>Vuelve a abrir esta página.</li>
+            </ol>
+          </div>
           <h3>Productos, precios y stock</h3>
           <p class="hint">Escribe las unidades disponibles y sal del recuadro para guardar. Vacío significa sin control de stock. Con “Editar” cambias qué contiene cada sabor y su precio.</p>
           <div class="prod-list" id="prod-list"><p class="loading">Cargando…</p></div>
@@ -92,8 +102,8 @@
   </section>
 </main>
 
-<script src="config.js"></script>
-<script src="comun.js"></script>
+<script src="config.js?v=20261113"></script>
+<script src="comun.js?v=20261113"></script>
 <script>
 let token = null;
 let productos = [], porId = {}, porNombre = {};
@@ -145,6 +155,8 @@ async function entrar() {
 /* ---------- productos y stock ---------- */
 function usarProductos(lista) {
   productos = lista;
+  // El script anterior de la hoja no manda "contiene": hay que actualizarlo para editar el detalle.
+  $("aviso-script").hidden = !productos.length || productos.some(p => "contiene" in p);
   porId = Object.fromEntries(productos.map(p => [p.id, p]));
   porNombre = Object.fromEntries(productos.map(p => [norm(p.name), p.id]));
   pintarProductos(); leerPedidoPegado();

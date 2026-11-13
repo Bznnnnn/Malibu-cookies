@@ -11,3 +11,5 @@ Página de Malibú Cookies (Talca): menú de cookies, frutitas virales y tortas,
 - `apps-script/Codigo.gs`: script que va dentro de la hoja de Google (catálogo, stock, pedidos y credenciales).
 
 Los datos y las claves viven en la hoja de Google del negocio, no en este repositorio.
+
+Al cambiar `comun.js`, `estilos.css` o `tortas.js`, sube el número `?v=` con que se cargan en `index.html` y `admin.html`. Así el navegador no junta una página nueva con un archivo viejo guardado.
