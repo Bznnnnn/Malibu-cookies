@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="estilos.css?v=20261113">
+<link rel="stylesheet" href="estilos.css?v=20261115">
 </head>
 <body>
 <header class="top">
@@ -151,13 +151,14 @@
       <div class="sec-head"><div><div class="eyebrow">Fácil y rápido</div><h2>Cómo pedir</h2></div></div>
       <div class="steps">
         <div class="card step"><b>1</b><h3>Arma tu pedido</h3><p>Elige cookies y frutitas con el botón + y arma tu torta en la pestaña Tortas. Todo va en un solo pedido.</p></div>
-        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige delivery o retiro, escribe tu nombre y la fecha de entrega (desde el día siguiente), y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
+        <div class="card step"><b>2</b><h3>Envía tu pedido</h3><p>Elige la fecha de entrega (desde el día siguiente) y dónde lo recibes, escribe tu nombre y toca “Enviar por WhatsApp”. El mensaje se arma solo.</p></div>
         <div class="card step"><b>3</b><h3>Confirmamos y pagas</h3><p>Te respondemos con el total final, con el envío y el diseño de la torta si corresponde, y los datos de pago. Con el pago confirmado, tu pedido queda reservado.</p></div>
       </div>
       <div class="info">
         <div class="card" id="entregas">
           <h3>Entregas en Talca</h3>
-          <p>Hacemos delivery dentro de Talca. Los pedidos se agendan desde el día siguiente: no hacemos entregas el mismo día. El costo del despacho varía según el sector donde vivas; te lo confirmamos junto con el total de tu pedido. Si prefieres retirar, elige Retiro al hacer tu pedido y lo coordinamos por WhatsApp.</p>
+          <p>Los pedidos se agendan desde el día siguiente: no hacemos entregas el mismo día. Al enviar tu pedido eliges la fecha y dónde recibirlo.</p>
+          <div class="entregas-lista" id="entregas-lista"></div>
         </div>
         <div class="card">
           <h3>WhatsApp</h3>
@@ -190,26 +191,30 @@
     <button class="btn btn-line" type="button" id="bag-toggle">Datos</button>
     <a class="btn btn-wa" id="bag-wa" href="https://wa.me/56956014992" target="_blank" rel="noopener">Enviar por WhatsApp</a>
     <div class="fields" id="bag-fields">
-      <div class="modo" role="radiogroup" aria-labelledby="modo-titulo">
-        <span id="modo-titulo">¿Cómo lo quieres recibir?</span>
-        <label class="opt" for="f-delivery"><input type="radio" name="entrega" value="Delivery" id="f-delivery"><span>Delivery</span></label>
-        <label class="opt" for="f-retiro"><input type="radio" name="entrega" value="Retiro" id="f-retiro"><span>Retiro</span></label>
-      </div>
-      <p class="aviso" id="f-aviso" role="alert" hidden>Elige delivery o retiro para enviar tu pedido.</p>
-      <label for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
+      <p class="aviso" id="f-aviso" role="alert" hidden></p>
       <label for="f-fecha">Fecha de entrega<input type="date" id="f-fecha"><small class="ayuda" id="f-fecha-ayuda">Desde mañana: no hacemos entregas el mismo día.</small></label>
-      <label class="ancho" id="f-sector-wrap" for="f-sector" hidden>Sector o dirección en Talca<input id="f-sector" autocomplete="street-address"></label>
-      <p class="nota" id="f-nota-retiro" hidden>Coordinamos el retiro contigo por WhatsApp.</p>
-      <p class="nota" id="f-nota-envio" hidden>La preorden no incluye el envío: depende de tu sector y te lo confirmamos por WhatsApp.</p>
+      <label for="f-name">Tu nombre<input id="f-name" autocomplete="name"></label>
+      <div class="donde" id="f-donde" role="radiogroup" aria-labelledby="donde-titulo">
+        <span class="donde-titulo" id="donde-titulo">¿Dónde lo recibes?</span>
+        <p class="nota" id="f-donde-msg" aria-live="polite">Elige la fecha para ver las opciones de ese día.</p>
+        <div id="f-opciones"></div>
+      </div>
+      <div class="donde" id="f-lugares" role="radiogroup" aria-labelledby="lugares-titulo" hidden>
+        <span class="donde-titulo" id="lugares-titulo">¿Dónde?</span>
+        <div class="opts" id="f-lugares-opts"></div>
+      </div>
+      <label class="ancho" id="f-sector-wrap" for="f-sector" hidden>Dirección<input id="f-sector" autocomplete="street-address" placeholder="Calle, número y alguna referencia"></label>
+      <p class="nota" id="f-nota-entrega" hidden></p>
       <p class="nota fotos" id="f-fotos" hidden>📎 Después de enviar el mensaje, adjunta también tus fotos de referencia en el chat de WhatsApp con el clip.</p>
       <pre id="bag-text"></pre>
     </div>
   </div>
 </div>
 
-<script src="config.js?v=20261113"></script>
-<script src="comun.js?v=20261113"></script>
-<script src="tortas.js?v=20261113"></script>
+<script src="config.js?v=20261115"></script>
+<script src="comun.js?v=20261115"></script>
+<script src="tortas.js?v=20261115"></script>
+<script src="entregas.js?v=20261115"></script>
 <script>
 let productos = [];
 let porId = {}, porNombre = {};
@@ -543,11 +548,90 @@ if (MENU_TORTAS && Array.isArray(MENU_TORTAS.porciones)) iniciarArmado();
 else $("torta-form").innerHTML = `<h3>Arma tu torta</h3><p class="loading">Pronto podrás armar tu torta aquí. Mientras, escríbenos por WhatsApp.</p>`;
 
 /* ---------- Pedido: cookies, frutitas y tortas en un solo mensaje ---------- */
-let entrega = ""; // "Delivery" o "Retiro"
 // No hay entregas el mismo día: la fecha más cercana es mañana.
 const fechaMinima = () => { const d = new Date(); d.setDate(d.getDate() + 1); return isoDia(d); };
 const fechaInvalida = () => !!$("f-fecha").value && $("f-fecha").value < fechaMinima();
 $("f-fecha").min = fechaMinima();
+
+/* ---------- Entregas: las opciones de entregas.js que se ofrecen el día de la fecha elegida ---------- */
+const ENTREGAS = (window.MALIBU_ENTREGAS || []).filter(o => o && o.id && o.nombre);
+const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const DIAS_PLURAL = ["domingos", "lunes", "martes", "miércoles", "jueves", "viernes", "sábados"];
+const diasDe = o => Array.isArray(o.dias) && o.dias.length ? o.dias.map(Number) : [0, 1, 2, 3, 4, 5, 6];
+const preciosEnvio = o => [].concat(o.precio ?? []).map(Number).filter(n => n > 0);
+const textoPrecios = lista => lista.map(n => pesos(n)).join(" o ");
+const lugaresDe = o => Array.isArray(o.lugares) ? o.lugares.map(String).filter(Boolean) : [];
+let entregaId = "", lugar = "", fechaPintada = null;
+
+// Día de la semana de la fecha elegida (0 domingo … 6 sábado), o -1 si falta o es antes de mañana.
+function diaElegido() {
+  const v = $("f-fecha").value;
+  if (!v || fechaInvalida()) return -1;
+  const [y, m, d] = v.split("-").map(Number);
+  return y && m && d ? new Date(y, m - 1, d).getDay() : -1;
+}
+const opcionesDelDia = () => { const dia = diaElegido(); return dia < 0 ? [] : ENTREGAS.filter(o => diasDe(o).includes(dia)); };
+// Lo elegido solo vale si esa opción se ofrece el día de la fecha elegida.
+const entregaActual = () => opcionesDelDia().find(o => o.id === entregaId) || null;
+const lugarActual = () => { const o = entregaActual(); return o && lugaresDe(o).includes(lugar) ? lugar : ""; };
+function agrupar(lista) {
+  const grupos = new Map();
+  for (const o of lista) {
+    const g = String(o.grupo || "Entrega");
+    if (!grupos.has(g)) grupos.set(g, []);
+    grupos.get(g).push(o);
+  }
+  return [...grupos];
+}
+function textoDias(o) {
+  const dias = new Set(diasDe(o));
+  const son = lista => lista.length === dias.size && lista.every(d => dias.has(d));
+  if (son([0, 1, 2, 3, 4, 5, 6])) return "Todos los días";
+  if (son([1, 2, 3, 4, 5])) return "Lunes a viernes";
+  if (son([1, 2, 3, 4, 5, 6])) return "Lunes a sábado";
+  if (son([6, 0])) return "Sábados y domingos";
+  const t = listaY([1, 2, 3, 4, 5, 6, 0].filter(d => dias.has(d)).map(d => DIAS_PLURAL[d]));
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+const radio = (nombre, valor, marcado, contenido) => `<label class="opt"><input type="radio" name="${nombre}" value="${esc(valor)}"${marcado ? " checked" : ""}><span>${contenido}</span></label>`;
+
+// Al cambiar la fecha se muestran las opciones de ese día. Si lo elegido no se ofrece ese día, se avisa y se elige de nuevo.
+function pintarOpciones() {
+  const ops = opcionesDelDia(), dia = diaElegido(), antes = ENTREGAS.find(o => o.id === entregaId);
+  let msg = "";
+  if (!$("f-fecha").value) msg = "Elige la fecha para ver las opciones de ese día.";
+  else if (dia < 0) msg = "Elige una fecha desde mañana para ver las opciones de ese día.";
+  else if (!ops.length) msg = "Ese día no hay entregas. Elige otra fecha.";
+  else if (antes && !ops.includes(antes)) {
+    msg = `${antes.nombre} no está disponible los ${DIAS_PLURAL[dia]}. Elige otra opción.`;
+    entregaId = "";
+  }
+  $("donde-titulo").textContent = ops.length ? `¿Dónde lo recibes el ${DIAS[dia]}?` : "¿Dónde lo recibes?";
+  $("f-donde-msg").textContent = msg;
+  $("f-donde-msg").hidden = !msg;
+  $("f-opciones").innerHTML = agrupar(ops).map(([grupo, lista], i) => `<div class="grupo" role="group" aria-labelledby="grupo-${i}"><span class="grupo-titulo" id="grupo-${i}">${esc(grupo)}</span><div class="opts">${lista.map(o => {
+    const precios = preciosEnvio(o);
+    return radio("donde", o.id, o.id === entregaId, `${esc(o.nombre)}${o.detalle ? `<small>${esc(o.detalle)}</small>` : ""}${precios.length ? `<b>${textoPrecios(precios)}</b>` : ""}`);
+  }).join("")}</div></div>`).join("");
+  mostrarDetalles();
+}
+// Lo que pide la opción elegida: a qué lugar (las universidades), la dirección y su aviso.
+function mostrarDetalles() {
+  const o = entregaActual(), lugares = o ? lugaresDe(o) : [];
+  $("f-lugares").hidden = !lugares.length;
+  $("lugares-titulo").textContent = (o && o.pregunta) || "¿Dónde?";
+  $("f-lugares-opts").innerHTML = lugares.map(l => radio("lugar", l, l === lugar, esc(l))).join("");
+  $("f-sector-wrap").hidden = !(o && o.direccion);
+  $("f-nota-entrega").textContent = (o && o.nota) || "";
+  $("f-nota-entrega").hidden = !(o && o.nota);
+}
+// La tarjeta "Entregas en Talca" muestra todas las opciones, con sus días y precios.
+function pintarEntregas() {
+  $("entregas-lista").innerHTML = agrupar(ENTREGAS).map(([grupo, lista]) => `<div><h4>${esc(grupo)}</h4><ul>${lista.map(o => {
+    const precios = preciosEnvio(o);
+    return `<li><span><strong>${esc(o.nombre)}</strong><small>${esc([textoDias(o), o.detalle].filter(Boolean).join(" · "))}</small></span>${precios.length ? `<b>${textoPrecios(precios)}</b>` : ""}</li>`;
+  }).join("")}</ul></div>`).join("");
+}
 
 function lineasTorta(t) {
   const l = [`🎂 ${nombreTorta(t)} (${precioTorta(t)})`];
@@ -565,40 +649,59 @@ function textoPedido() {
     return `• ${q} × ${porId[id].name}` + (precio ? ` (${pesos(q * precio)})` : "");
   }).join("\n"));
   if (tortas.length) bloques.push(tortas.map(t => lineasTorta(t).join("\n")).join("\n"));
-  // Al final: cuántas cookies, frutitas y tortas son, y la preorden, que no incluye el envío.
-  const r = resumenPedido(pares, porId, tortas);
+  // Al final: cuántas cookies, frutitas y tortas son, la preorden y el envío si la entrega elegida lo cobra.
+  const r = resumenPedido(pares, porId, tortas), o = entregaActual(), envios = o ? preciosEnvio(o) : [];
+  const diseno = r.masDiseno ? " + diseño" : "";
   const cuenta = [`Total: ${r.conteoTotal}`];
-  if (r.total) cuenta.push(`Preorden: ${pesos(r.total)}` + (r.masDiseno ? " + diseño" : "") + (entrega === "Delivery" ? " (sin envío)" : ""));
+  if (r.total) cuenta.push(`Preorden: ${pesos(r.total)}${diseno}`);
+  if (envios.length) {
+    cuenta.push(`Envío: ${textoPrecios(envios)}${envios.length > 1 ? " según la dirección" : ""}`);
+    if (r.total) cuenta.push(`Total con envío: ${textoPrecios(envios.map(n => r.total + n))}${diseno}`);
+  } else if (o && o.direccion) cuenta.push("Envío: por confirmar");
   bloques.push(cuenta.join("\n"));
-  const nombre = $("f-name").value.trim(), sector = $("f-sector").value.trim(), fecha = fechaLarga($("f-fecha").value);
+  const nombre = $("f-name").value.trim(), direccion = $("f-sector").value.trim(), fecha = fechaLarga($("f-fecha").value), l = lugarActual();
   const datos = [];
   if (nombre) datos.push(`Nombre: ${nombre}`);
-  if (entrega) datos.push(`Entrega: ${entrega}`);
-  if (entrega === "Delivery" && sector) datos.push(`Dirección: ${sector}`);
+  if (o) datos.push(`Entrega: ${o.mensaje || o.nombre}${l ? ` (${l})` : ""}`);
+  if (o && o.direccion && direccion) datos.push(`Dirección: ${direccion}`);
   if (fecha) datos.push(`Fecha de entrega: ${fecha}`);
   if (datos.length) bloques.push(datos.join("\n"));
   if (tortas.some(t => t.fotos)) bloques.push("📎 Te envío también las fotos de referencia aquí en el chat.");
   return "Hola Malibú! Quiero hacer este pedido:\n" + bloques.join("\n\n");
 }
-// Lo que falta para enviar: delivery o retiro siempre, una fecha desde mañana, y la fecha si el pedido lleva torta.
+// Lo que falta para enviar: una fecha desde mañana, dónde recibirlo y, según la opción, el lugar o la dirección.
 function faltaEnBolsa() {
-  if (!entrega) return ["Elige delivery o retiro para enviar tu pedido.", $("f-delivery")];
+  const primero = nombre => document.querySelector(`input[name="${nombre}"]`);
+  if (!$("f-fecha").value) return ["Elige la fecha de entrega.", $("f-fecha")];
   if (fechaInvalida()) return ["No hacemos entregas el mismo día. Elige una fecha desde mañana.", $("f-fecha")];
-  if (tortas.length && !$("f-fecha").value) return ["Elige la fecha de entrega de tu torta.", $("f-fecha")];
+  if (!ENTREGAS.length) return null; // sin la lista de entregas, se coordina por WhatsApp
+  if (!opcionesDelDia().length) return ["Ese día no hay entregas. Elige otra fecha.", $("f-fecha")];
+  const o = entregaActual();
+  if (!o) return ["Elige dónde quieres recibir tu pedido.", primero("donde")];
+  if (lugaresDe(o).length && !lugarActual()) return [`${o.pregunta || "¿Dónde?"} Elige una opción.`, primero("lugar")];
+  if (o.direccion && !$("f-sector").value.trim()) return ["Escribe tu dirección para el envío.", $("f-sector")];
   return null;
+}
+// El aviso aparece justo arriba de lo que falta, para que se vea aunque los datos no quepan en la pantalla.
+function mostrarAviso(falta) {
+  const aviso = $("f-aviso"), bloque = falta[1] && falta[1].closest("#bag-fields > *");
+  if (bloque && bloque !== aviso && bloque.previousElementSibling !== aviso) bloque.before(aviso);
+  aviso.textContent = falta[0];
+  aviso.hidden = false;
 }
 function actualizarBolsa() {
   for (const id in carrito) if (!porId[id]) delete carrito[id];
   const r = resumenPedido(Object.entries(carrito), porId, tortas);
   $("bag").hidden = !r.unidades && !r.tortas;
   $("bag-count").textContent = r.conteo + (r.total ? " · " + pesos(r.total) + (r.masDiseno ? " + diseño" : "") : "");
+  const o = entregaActual();
   const nombres = Object.keys(carrito).map(id => porId[id].name).concat(tortas.map(t => "🎂 " + t.sabor));
-  $("bag-list").textContent = (entrega ? entrega + " · " : "") + nombres.join(", ");
+  $("bag-list").textContent = (o ? (lugarActual() || o.nombre) + " · " : "") + nombres.join(", ");
   $("f-fotos").hidden = !tortas.some(t => t.fotos);
   $("f-fecha-ayuda").classList.toggle("error", fechaInvalida());
   if (!$("f-aviso").hidden) {
     const f = faltaEnBolsa();
-    if (f) $("f-aviso").textContent = f[0]; else $("f-aviso").hidden = true;
+    if (f) mostrarAviso(f); else $("f-aviso").hidden = true;
   }
   const t = textoPedido();
   $("bag-text").textContent = t;
@@ -611,14 +714,30 @@ function abrirDatos(abrir) {
 }
 $("bag-toggle").addEventListener("click", () => abrirDatos(!$("bag").classList.contains("open")));
 
-document.querySelectorAll('input[name="entrega"]').forEach(r => r.addEventListener("change", () => {
-  entrega = r.value;
-  const esDelivery = entrega === "Delivery";
-  $("f-sector-wrap").hidden = !esDelivery;
-  $("f-nota-retiro").hidden = esDelivery;
-  $("f-nota-envio").hidden = !esDelivery;
+// La fecha manda: al cambiarla se muestran las opciones de ese día.
+function cambiarFecha() {
+  if ($("f-fecha").value === fechaPintada) return;
+  fechaPintada = $("f-fecha").value;
+  pintarOpciones();
   actualizarBolsa();
-}));
+}
+["input", "change"].forEach(ev => $("f-fecha").addEventListener(ev, cambiarFecha));
+$("f-opciones").addEventListener("change", e => {
+  if (e.target.name !== "donde") return;
+  entregaId = e.target.value;
+  $("f-donde-msg").hidden = true;
+  mostrarDetalles();
+  actualizarBolsa();
+});
+$("f-lugares-opts").addEventListener("change", e => {
+  if (e.target.name !== "lugar") return;
+  lugar = e.target.value;
+  actualizarBolsa();
+});
+["f-name", "f-sector"].forEach(id => $(id).addEventListener("input", actualizarBolsa));
+$("f-donde").hidden = !ENTREGAS.length;
+pintarEntregas();
+pintarOpciones();
 
 // Si falta algo, el botón abre los datos y lo indica en vez de ir a WhatsApp.
 $("bag-wa").addEventListener("click", e => {
@@ -626,11 +745,9 @@ $("bag-wa").addEventListener("click", e => {
   if (!falta) return;
   e.preventDefault();
   abrirDatos(true);
-  $("f-aviso").textContent = falta[0];
-  $("f-aviso").hidden = false;
-  falta[1].focus();
+  mostrarAviso(falta);
+  if (falta[1]) falta[1].focus();
 });
-["f-name", "f-sector", "f-fecha"].forEach(id => ["input", "change"].forEach(ev => $(id).addEventListener(ev, actualizarBolsa)));
 
 async function cargar() {
   try {

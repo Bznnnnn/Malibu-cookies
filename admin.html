@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="estilos.css?v=20261113">
+<link rel="stylesheet" href="estilos.css?v=20261115">
 </head>
 <body>
 <header class="top">
@@ -102,8 +102,8 @@
   </section>
 </main>
 
-<script src="config.js?v=20261113"></script>
-<script src="comun.js?v=20261113"></script>
+<script src="config.js?v=20261115"></script>
+<script src="comun.js?v=20261115"></script>
 <script>
 let token = null;
 let productos = [], porId = {}, porNombre = {};
@@ -291,7 +291,8 @@ function leerPedidoPegado() {
       masDiseno: m ? /\+\s*dise/i.test(m[2]) : /\+\s*dise/i.test(l),
     };
   });
-  const resto = lineas.filter(l => !/^\s*(🎂|·)/.test(l) && !/https?:\/\//.test(l));
+  // Los datos del cliente (nombre, dirección, envío…) no son productos, aunque traigan números.
+  const resto = lineas.filter(l => !/^\s*(🎂|·)/.test(l) && !/https?:\/\//.test(l) && !/^\s*(Nombre|Entrega|Direcci[oó]n|Fecha de entrega|Env[ií]o|Total|Preorden)\b/i.test(l));
   // Si el mensaje trae viñetas (•), solo se leen esas líneas, así el nombre o la dirección no se confunden con productos.
   const conVineta = resto.filter(l => /^\s*[•\-*]/.test(l));
   (conVineta.length ? conVineta : resto).forEach(linea => {
@@ -308,7 +309,17 @@ function leerPedidoPegado() {
     return `<li class="${n < p.qty ? "bad" : ""}"><span>${p.qty} × ${esc(porId[p.id].name)}</span><span>${n === Infinity ? "sin control de stock" : n < p.qty ? "Solo quedan " + n : "quedarán " + (n - p.qty)}</span></li>`;
   }).join("") + tortasPegadas.map(t => `<li class="torta"><span>🎂 ${esc(t.texto)}</span><span>${t.precio ? pesos(t.precio) + (t.masDiseno ? " + diseño" : "") + " · " : ""}no descuenta stock</span></li>`).join("");
   const r = resumenPedido(pegado.filter(p => p.id).map(p => [p.id, p.qty]), porId, tortasPegadas);
-  if (r.unidades || r.tortas) $("parsed").innerHTML += `<li class="sum"><span>Total: ${esc(r.conteoTotal)}</span><span>Preorden ${pesos(r.total)}${r.masDiseno ? " + diseño" : ""}</span></li>`;
+  if (r.unidades || r.tortas) {
+    let filas = `<li class="sum"><span>Total: ${esc(r.conteoTotal)}</span><span>Preorden ${pesos(r.total)}${r.masDiseno ? " + diseño" : ""}</span></li>`;
+    // El envío viene en el mensaje según la entrega que eligió el cliente, por ejemplo "Envío: $2.000".
+    const envio = ((texto.match(/^\s*Env[ií]o:\s*(.+)$/m) || [])[1] || "").trim();
+    if (envio) {
+      const montos = [...envio.matchAll(/\$\s*([\d.]+)/g)].map(m => Number(m[1].replace(/\./g, ""))).filter(n => n > 0);
+      filas += `<li class="envio"><span>Envío</span><span>${esc(envio)}</span></li>`;
+      if (montos.length && r.total) filas += `<li class="sum"><span>Total con envío</span><span>${montos.map(n => pesos(r.total + n)).join(" o ")}${r.masDiseno ? " + diseño" : ""}</span></li>`;
+    }
+    $("parsed").innerHTML += filas;
+  }
   $("confirm-btn").disabled = !pegado.length || malo;
 }
 $("order-in").addEventListener("input", () => { leerPedidoPegado(); $("confirm-msg").textContent = ""; });
