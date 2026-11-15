@@ -1,5 +1,6 @@
-// Opciones de entrega de Malibú Cookies. Al hacer el pedido, la persona elige la fecha y
-// le aparecen solo las opciones de ese día, en este mismo orden.
+// Opciones de entrega de Malibú Cookies, en el orden en que aparecen al hacer el pedido.
+// Sin torta se muestran todas, cada una con sus días (el día se coordina por WhatsApp).
+// Si el pedido lleva torta se pide la fecha y aparecen solo las opciones de ese día.
 //
 // Cada opción tiene:
 //   grupo:     título bajo el que aparece ("Puntos de entrega y retiro" o "Delivery").
