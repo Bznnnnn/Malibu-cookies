@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="estilos.css?v=20261115b">
+<link rel="stylesheet" href="estilos.css?v=20261116">
 </head>
 <body>
 <header class="top">
@@ -92,6 +92,12 @@
               <li>Vuelve a abrir esta página.</li>
             </ol>
           </div>
+          <div class="nuevos" id="nuevos" role="region" aria-labelledby="nuevos-titulo" hidden>
+            <strong id="nuevos-titulo">Listos para agregar a tu menú</strong>
+            <ul id="nuevos-lista"></ul>
+            <button class="btn btn-ink" type="button" id="nuevos-btn">Agregar al menú</button>
+            <p class="msg" id="nuevos-msg" role="status"></p>
+          </div>
           <h3>Productos, precios y stock</h3>
           <p class="hint">Escribe las unidades disponibles y sal del recuadro para guardar. Vacío significa sin control de stock. Con “Editar” cambias qué contiene cada sabor y su precio.</p>
           <div class="prod-list" id="prod-list"><p class="loading">Cargando…</p></div>
@@ -102,8 +108,8 @@
   </section>
 </main>
 
-<script src="config.js?v=20261115b"></script>
-<script src="comun.js?v=20261115b"></script>
+<script src="config.js?v=20261116"></script>
+<script src="comun.js?v=20261116"></script>
 <script>
 let token = null;
 let productos = [], porId = {}, porNombre = {};
@@ -159,7 +165,7 @@ function usarProductos(lista) {
   $("aviso-script").hidden = !productos.length || productos.some(p => "contiene" in p);
   porId = Object.fromEntries(productos.map(p => [p.id, p]));
   porNombre = Object.fromEntries(productos.map(p => [norm(p.name), p.id]));
-  pintarProductos(); leerPedidoPegado();
+  pintarProductos(); leerPedidoPegado(); pintarNuevos();
 }
 // Editor de "qué contiene" y precio propio: uno abierto a la vez. Lo escrito se guarda en un
 // borrador para no perderlo si la lista se vuelve a pintar mientras se edita.
@@ -274,6 +280,49 @@ $("add-form").addEventListener("submit", async e => {
   const sinDetalle = nuevo && !("contiene" in nuevo) && ($("np-contiene").value.trim() || precio);
   if (r.ok) { $("add-form").reset(); aviso("add-msg", sinDetalle ? `Agregado: ${nombre}. Para guardar qué contiene y su precio, primero actualiza el script de tu hoja de Google.` : `Agregado: ${nombre} en ${MALIBU_SECCIONES[cat]}.`, !sinDetalle); }
   else aviso("add-msg", r.mensaje || "No se pudo agregar.", false);
+});
+
+/* ---------- sabores nuevos que ya tienen foto en el sitio: se agregan con un toque ---------- */
+const NUEVOS = [
+  { nombre: "Pistacho", cat: "f", precio: 5000, foto: "img/fr-pistacho.jpg" },
+  { nombre: "Maracuyá", cat: "f", precio: 4000, foto: "img/fr-maracuya.jpg" },
+];
+let agregandoNuevos = false, resultadoNuevos = "";
+const faltanNuevos = () => NUEVOS.filter(n => !porNombre[norm(n.nombre)]);
+function pintarNuevos() {
+  const faltan = faltanNuevos();
+  $("nuevos").hidden = !productos.length || (!faltan.length && !resultadoNuevos);
+  $("nuevos-lista").innerHTML = faltan.map(n => `<li><img src="${esc(n.foto)}" alt=""><span><b>${esc(n.nombre)}</b> ${esc(MALIBU_SECCIONES[n.cat])} · ${pesos(n.precio)}</span></li>`).join("");
+  $("nuevos-lista").hidden = $("nuevos-btn").hidden = !faltan.length;
+}
+$("nuevos-btn").addEventListener("click", async () => {
+  if (agregandoNuevos) return;
+  agregandoNuevos = true; $("nuevos-btn").disabled = true;
+  const listos = [], errores = [];
+  for (const n of faltanNuevos()) {
+    aviso("nuevos-msg", `Agregando ${n.nombre}…`, true);
+    let fotoBase64;
+    try {
+      const r = await fetch(n.foto, { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      fotoBase64 = await fotoEnBase64(await r.blob());
+    } catch (e) { errores.push(`${n.nombre}: no se pudo leer la foto`); continue; }
+    const r = await api({ action: "agregarProducto", nombre: n.nombre, cat: n.cat, stock: "", fotoBase64, contiene: "", precio: String(n.precio) });
+    if (r.ok) listos.push(n); else errores.push(`${n.nombre}: ${r.mensaje || "no se pudo agregar"}`);
+  }
+  agregandoNuevos = false; $("nuevos-btn").disabled = false;
+  // Con el script antiguo de la hoja no se guarda el precio propio: queda el de la sección.
+  const sinPrecio = listos.filter(n => {
+    const p = productos.find(x => norm(x.name) === norm(n.nombre));
+    return p && !("precio" in p) && n.precio !== precioSeccion(n.cat);
+  });
+  const partes = [];
+  if (listos.length) partes.push(`Listo: ${listaY(listos.map(n => n.nombre))} ya ${listos.length > 1 ? "están" : "está"} en la tienda.`);
+  if (sinPrecio.length) partes.push(`${listaY(sinPrecio.map(n => n.nombre))} quedó con el precio de la sección hasta que actualices el script de tu hoja (pasos de arriba). Después cámbialo con “Editar”.`);
+  if (errores.length) partes.push(errores.join(". ") + ".");
+  resultadoNuevos = partes.join(" ");
+  aviso("nuevos-msg", resultadoNuevos, !errores.length && !sinPrecio.length);
+  pintarNuevos();
 });
 
 /* ---------- pedidos ---------- */

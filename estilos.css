@@ -237,6 +237,11 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 .aviso-script p{margin:4px 0 8px;color:var(--ink-soft)}
 .aviso-script ol{margin:0;padding-left:20px;display:grid;gap:4px}
 .aviso-script a{color:var(--accent);font-weight:700}
+.nuevos{margin:0 0 18px;padding:14px 16px;border-radius:14px;border:2px solid var(--ok);background:var(--white);font-size:.92rem}
+.nuevos ul{list-style:none;margin:10px 0 12px;padding:0;display:grid;gap:8px}
+.nuevos li{display:flex;align-items:center;gap:10px}
+.nuevos img{width:52px;height:52px;flex:none;border-radius:50%;background:var(--plate)}
+.nuevos .msg{margin:8px 0 0}
 .prod-row .editor{grid-column:1/-1;display:grid;gap:10px;margin-top:4px;padding-top:12px;border-top:1px dashed var(--line)}
 .prod-row .editor label{display:grid;gap:5px;font-size:.85rem;font-weight:600}
 .admin .prod-row .editor textarea{min-height:64px}
